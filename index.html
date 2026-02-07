@@ -6,16 +6,6 @@
     <title>UPT PSDA - Pro Attendance System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        window.firebaseInit = { initializeApp, getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken, getFirestore, doc, setDoc, getDoc };
-    </script>
-
     <style>
         :root {
             --glass-bg: rgba(255, 255, 255, 0.25);
@@ -102,9 +92,10 @@
         }
         .toast-pro.show { transform: translateX(-50%) translateY(0); }
 
+        /* Drop Shadow Portrait Gelap yang Dalam */
         .photo-portrait-shadow {
-            box-shadow: 0 35px 80px -15px rgba(0, 0, 0, 0.8), 0 25px 40px -20px rgba(0, 0, 0, 1);
-            border: 5px solid rgba(255,255,255,0.25);
+            box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.7), 0 20px 40px -20px rgba(0, 0, 0, 0.8);
+            border: 4px solid rgba(255,255,255,0.3);
         }
 
         #modal-confirm {
@@ -180,52 +171,45 @@
                 <h1 class="text-3xl font-extrabold text-slate-800 tracking-tighter text-center uppercase leading-none">UPT PSDA<br><span class="text-emerald-600">BONDOYUDO</span></h1>
             </div>
             <div class="space-y-4">
-                <input id="login-username" type="text" placeholder="Nama / Email / HP" class="input-glass">
+                <input id="login-username" type="text" placeholder="Username / Email / HP" class="input-glass">
                 <input id="login-password" type="password" placeholder="Password" class="input-glass">
-                
-                <!-- Saved Session Option -->
-                <div class="flex items-center gap-3 px-2 py-1">
-                    <input type="checkbox" id="save-session" class="w-5 h-5 rounded border-white/30 bg-white/20 text-emerald-600 focus:ring-emerald-500 cursor-pointer">
-                    <label for="save-session" class="text-[10px] font-black text-slate-600 uppercase tracking-widest cursor-pointer">Simpan Sesi Login</label>
-                </div>
-
-                <button id="login-btn-action" onclick="window.handleLogin()" class="w-full pill-glass-3d py-4 bg-slate-900 text-white font-black text-lg shadow-[0_6px_0_#000]">MASUK</button>
+                <button onclick="handleLogin()" class="w-full pill-glass-3d py-4 bg-slate-900 text-white font-black text-lg shadow-[0_6px_0_#000]">MASUK</button>
             </div>
             <div class="flex justify-between items-end pb-4 pt-10 px-2">
-                <button onclick="window.navigateTo('forgot-screen')" class="text-left group focus:outline-none"><p class="text-slate-800 font-bold text-xs leading-none">Password</p><p class="text-[10px] text-slate-500 uppercase group-hover:underline">Lupa Sandi?</p></button>
-                <button onclick="window.navigateTo('register-screen')" class="text-right group focus:outline-none"><p class="text-emerald-700 font-bold text-xs leading-none">Register</p><p class="text-[10px] text-slate-500 uppercase underline">Daftar Akun</p></button>
+                <button onclick="navigateTo('forgot-screen')" class="text-left group focus:outline-none"><p class="text-slate-800 font-bold text-xs leading-none">Password</p><p class="text-[10px] text-slate-500 uppercase group-hover:underline">Lupa Sandi?</p></button>
+                <button onclick="navigateTo('register-screen')" class="text-right group focus:outline-none"><p class="text-emerald-700 font-bold text-xs leading-none">Register</p><p class="text-[10px] text-slate-500 uppercase underline">Daftar Akun</p></button>
             </div>
         </div>
 
         <!-- SCREEN: REGISTER -->
         <div id="register-screen" class="screen screen-hidden overflow-y-auto scrollbar-hide">
-            <div class="flex items-center gap-4 mb-8" onclick="window.navigateTo('login-screen')">
-                <div class="p-2 bg-slate-900/10 rounded-xl"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="3"/></svg></div>
+            <div class="flex items-center gap-4 mb-8" onclick="navigateTo('login-screen')">
+                <div class="p-2 bg-slate-900/10 rounded-xl"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg></div>
                 <h2 class="text-xl font-black text-slate-800 tracking-tight">Pendaftaran Pegawai</h2>
             </div>
             <div class="space-y-6 pb-12">
                 <div class="flex flex-col items-center space-y-4">
-                    <div class="w-32 h-48 rounded-[25px] relative photo-portrait-shadow overflow-hidden bg-slate-300">
+                    <div class="w-32 h-48 rounded-[25px] relative photo-portrait-shadow overflow-hidden bg-slate-400">
                         <div id="preview-profile" class="absolute inset-0 hidden"><img class="w-full h-full object-cover"></div>
                         <div id="placeholder-reg-photo" class="absolute inset-0 flex items-center justify-center">
                             <svg id="placeholder-icon" class="w-12 h-12 text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                         </div>
                     </div>
                     <div class="flex gap-4">
-                        <button onclick="window.openCamera('profile')" class="pill-glass-3d p-3 bg-white/50 text-slate-700 flex items-center gap-2 text-xs font-bold"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Ambil Foto</button>
+                        <button onclick="openCamera('profile')" class="pill-glass-3d p-3 bg-white/50 text-slate-700 flex items-center gap-2 text-xs font-bold"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Ambil Foto</button>
                         <button onclick="document.getElementById('file-upload-profile').click()" class="pill-glass-3d p-3 bg-white/50 text-slate-700 flex items-center gap-2 text-xs font-bold"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>Unggah</button>
-                        <input type="file" id="file-upload-profile" class="hidden" accept="image/*" onchange="window.handleFileUpload(event)">
+                        <input type="file" id="file-upload-profile" class="hidden" accept="image/*" onchange="handleFileUpload(event)">
                     </div>
                 </div>
                 <div class="space-y-4">
                     <input id="reg-id" type="text" placeholder="ID Pegawai (Contoh: P001)" class="input-glass">
                     <input id="reg-nama" type="text" placeholder="Nama Lengkap" class="input-glass">
-                    <select id="reg-jabatan" class="input-glass" onchange="window.toggleManual(this, 'manual-jabatan')">
+                    <select id="reg-jabatan" class="input-glass" onchange="toggleManual(this, 'manual-jabatan')">
                         <option value="" disabled selected>Pilih Jabatan</option>
                         <option value="PPA">PPA</option><option value="Pekarya">Pekarya</option><option value="Staf Pengamat">Staf Pengamat</option><option value="manual">Isi manual...</option>
                     </select>
                     <input id="manual-jabatan" type="text" placeholder="Ketik Jabatan" class="input-glass hidden border-emerald-400">
-                    <select id="reg-wilayah" class="input-glass" onchange="window.toggleManual(this, 'manual-wilayah')">
+                    <select id="reg-wilayah" class="input-glass" onchange="toggleManual(this, 'manual-wilayah')">
                         <option value="" disabled selected>Pilih Wilayah</option>
                         <option value="Bangorejo">Bangorejo</option><option value="Cluring">Cluring</option><option value="Pesanggaran">Pesanggaran</option><option value="Porolinggo">Porolinggo</option><option value="manual">Isi manual...</option>
                     </select>
@@ -235,14 +219,14 @@
                     <input id="reg-lokasi" type="text" placeholder="Lokasi Penempatan" class="input-glass">
                     <input id="reg-password" type="password" placeholder="Password Baru" class="input-glass">
                 </div>
-                <button onclick="window.handleRegister()" class="w-full pill-glass-3d py-5 bg-emerald-600 text-white font-black text-lg shadow-[0_6px_0_#064e3b]">DAFTAR SEKARANG</button>
+                <button onclick="handleRegister()" class="w-full pill-glass-3d py-5 bg-emerald-600 text-white font-black text-lg shadow-[0_6px_0_#064e3b]">DAFTAR SEKARANG</button>
             </div>
         </div>
 
         <!-- SCREEN: FORGOT PASSWORD -->
         <div id="forgot-screen" class="screen screen-hidden">
-            <div class="flex items-center gap-4 mb-10" onclick="window.navigateTo('login-screen')">
-                <div class="p-2 bg-slate-900/10 rounded-xl"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="3"/></svg></div>
+            <div class="flex items-center gap-4 mb-10" onclick="navigateTo('login-screen')">
+                <div class="p-2 bg-slate-900/10 rounded-xl"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg></div>
                 <h2 class="text-xl font-black text-slate-800">Reset Password</h2>
             </div>
             <div class="flex-1 flex flex-col justify-center space-y-6">
@@ -253,7 +237,7 @@
                     <p class="text-sm text-slate-600">Masukkan kontak terdaftar (Email/HP) untuk pemulihan.</p>
                 </div>
                 <input id="forgot-input" type="text" placeholder="Email / Nomor HP" class="input-glass">
-                <button onclick="window.handleForgotPassword()" class="w-full pill-glass-3d py-5 bg-amber-600 text-white font-black text-lg shadow-[0_6px_0_#92400e]">KIRIM PERMINTAAN</button>
+                <button onclick="handleForgotPassword()" class="w-full pill-glass-3d py-5 bg-amber-600 text-white font-black text-lg shadow-[0_6px_0_#92400e]">KIRIM PERMINTAAN</button>
             </div>
         </div>
 
@@ -261,7 +245,7 @@
         <div id="presensi-screen" class="screen screen-hidden overflow-y-auto scrollbar-hide !px-0">
             <div class="flex flex-col items-center pt-8 px-6 mb-4">
                 <div class="rounded-[35px] relative photo-portrait-shadow overflow-hidden" style="width: 120px; height: 180px;">
-                    <img id="user-photo" src="" class="w-full h-full object-cover bg-white">
+                    <img id="user-photo" src="" class="w-full h-full object-cover bg-slate-100">
                     <div id="photo-v" class="absolute bottom-2 right-2 w-8 h-8 bg-emerald-500 rounded-full border-2 border-white hidden items-center justify-center text-white text-xs font-black shadow-lg">V</div>
                 </div>
                 <div class="mt-5 text-center px-4">
@@ -269,29 +253,29 @@
                     <p id="user-job" class="text-[10px] font-bold text-emerald-600 tracking-widest uppercase">...</p>
                     <div id="gps-status-container" class="mt-3 px-5 py-2 bg-white/50 rounded-full border border-white inline-flex items-center gap-2 shadow-sm">
                         <div id="gps-dot" class="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></div>
-                        <span id="gps-text" class="text-[10px] font-black uppercase tracking-tight">Kunci Koordinat</span>
+                        <span id="gps-text" class="text-[10px] font-black uppercase tracking-tight">Menunggu GPS</span>
                         <span id="gps-v" class="hidden text-emerald-600 font-bold text-xs ml-1">V</span>
                     </div>
                 </div>
             </div>
 
             <div class="px-6 mb-4">
-                <button id="lock-gps-btn" onclick="window.getRealLocation()" class="w-full pill-glass-3d py-5 bg-emerald-600 text-white font-black text-sm uppercase tracking-widest !shadow-[0_6px_0_#064e3b]">KUNCI LOKASI GPS (STEP 1)</button>
+                <button id="lock-gps-btn" onclick="getRealLocation()" class="w-full pill-glass-3d py-5 bg-emerald-600 text-white font-black text-sm uppercase tracking-widest !shadow-[0_6px_0_#064e3b]">KUNCI LOKASI GPS (STEP 1)</button>
             </div>
 
             <div id="attendance-form" class="locked-section space-y-8 bg-white/20 border-y border-white/40 py-10 px-6 shadow-2xl mb-8 w-full rounded-[55px]">
                 <div class="space-y-4">
-                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Jenis Presensi <span id="status-v" class="step-check hidden ml-2">V Terpilih</span></label>
+                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Pilih Status <span id="status-v" class="step-check hidden ml-2">V Terpilih</span></label>
                     <div class="grid grid-cols-2 gap-4">
-                        <button id="btn-hadir" onclick="window.setStatus('Hadir', this)" class="status-btn pill-glass-3d py-6 font-black text-xs uppercase">Hadir</button>
-                        <button id="btn-pulang" onclick="window.setStatus('Pulang', this)" class="status-btn pill-glass-3d py-6 font-black text-xs uppercase">Pulang</button>
+                        <button id="btn-hadir" onclick="setStatus('Hadir', this)" class="status-btn pill-glass-3d py-6 font-black text-xs uppercase">Hadir</button>
+                        <button id="btn-pulang" onclick="setStatus('Pulang', this)" class="status-btn pill-glass-3d py-6 font-black text-xs uppercase">Pulang</button>
                     </div>
                     <div class="grid grid-cols-3 gap-3">
-                        <button id="btn-izin" onclick="window.setStatus('Izin', this)" class="status-btn pill-glass-3d py-4 font-bold text-[9px] uppercase">Izin</button>
-                        <button id="btn-cuti" onclick="window.setStatus('Cuti', this)" class="status-btn pill-glass-3d py-4 font-bold text-[9px] uppercase">Cuti</button>
-                        <button id="btn-sakit" onclick="window.setStatus('Sakit', this)" class="status-btn pill-glass-3d py-4 font-bold text-[9px] uppercase">Sakit</button>
-                        <button id="btn-dinas" onclick="window.setStatus('Dinas', this)" class="status-btn pill-glass-3d py-4 font-bold text-[9px] uppercase">Dinas</button>
-                        <button id="btn-margin" onclick="window.setStatus('Margin Error', this)" class="status-btn pill-glass-3d py-4 font-bold text-red-600 uppercase col-span-2 tracking-tighter">Margin Error</button>
+                        <button id="btn-izin" onclick="setStatus('Izin', this)" class="status-btn pill-glass-3d py-4 font-bold text-[9px] uppercase">Izin</button>
+                        <button id="btn-cuti" onclick="setStatus('Cuti', this)" class="status-btn pill-glass-3d py-4 font-bold text-[9px] uppercase">Cuti</button>
+                        <button id="btn-sakit" onclick="setStatus('Sakit', this)" class="status-btn pill-glass-3d py-4 font-bold text-[9px] uppercase">Sakit</button>
+                        <button id="btn-dinas" onclick="setStatus('Dinas', this)" class="status-btn pill-glass-3d py-4 font-bold text-[9px] uppercase">Dinas</button>
+                        <button id="btn-margin" onclick="setStatus('Margin Error', this)" class="status-btn pill-glass-3d py-4 font-bold text-red-600 uppercase col-span-2 tracking-tighter">Margin Error</button>
                     </div>
                     <div id="duration-box" class="hidden mt-4 bg-white/30 p-4 rounded-3xl border border-white/50">
                          <label class="text-[10px] font-black text-blue-700 uppercase mb-2 block tracking-widest text-center">Rentang Waktu (Hari)</label>
@@ -301,57 +285,44 @@
 
                 <div class="space-y-2">
                     <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Keterangan Aktivitas <span id="notes-v" class="step-check hidden ml-2">V Terisi</span></label>
-                    <textarea id="attendance-notes" oninput="window.validateForm()" class="input-glass !h-36 resize-none focus:outline-none" placeholder="Tulis catatan atau bukti kendala..."></textarea>
+                    <textarea id="attendance-notes" oninput="validateForm()" class="input-glass !h-36 resize-none focus:outline-none" placeholder="Tulis catatan harian Anda..."></textarea>
                 </div>
 
                 <div class="space-y-4">
-                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Dokumentasi <span id="media-v" class="step-check hidden ml-2">V Lengkap</span></label>
+                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Lampiran Dokumentasi <span id="media-v" class="step-check hidden ml-2">V Lengkap</span></label>
                     <div class="grid grid-cols-2 gap-5">
                         <div class="relative">
-                            <button onclick="window.openCamera('selfie')" class="w-full pill-glass-3d aspect-square flex flex-col items-center justify-center gap-2 overflow-hidden">
+                            <button onclick="openCamera('selfie')" class="w-full pill-glass-3d aspect-square flex flex-col items-center justify-center gap-2 overflow-hidden">
                                 <div id="preview-selfie" class="absolute inset-0 hidden"><img class="w-full h-full object-cover"></div>
                                 <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-width="1.5"/></svg>
                                 <span class="text-[9px] font-black uppercase text-slate-500">Selfie</span>
                             </button>
-                            <button id="retry-selfie" onclick="window.openCamera('selfie')" class="absolute -top-2 -right-2 bg-white text-red-500 p-2 rounded-full hidden shadow-lg border border-red-100"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-width="3"/></svg></button>
+                            <button id="retry-selfie" onclick="openCamera('selfie')" class="absolute -top-2 -right-2 bg-white text-red-500 p-2 rounded-full hidden shadow-lg border border-red-100"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-width="3"/></svg></button>
                         </div>
                         <div class="relative">
-                            <button onclick="window.openCamera('kerja')" class="w-full pill-glass-3d aspect-square flex flex-col items-center justify-center gap-2 overflow-hidden">
+                            <button onclick="openCamera('kerja')" class="w-full pill-glass-3d aspect-square flex flex-col items-center justify-center gap-2 overflow-hidden">
                                 <div id="preview-kerja" class="absolute inset-0 hidden"><img class="w-full h-full object-cover"></div>
                                 <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-width="1.5"/></svg>
                                 <span class="text-[9px] font-black uppercase text-slate-500">Lokasi</span>
                             </button>
-                            <button id="retry-kerja" onclick="window.openCamera('kerja')" class="absolute -top-2 -right-2 bg-white text-red-500 p-2 rounded-full hidden shadow-lg border border-red-100"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-width="3"/></svg></button>
+                            <button id="retry-kerja" onclick="openCamera('kerja')" class="absolute -top-2 -right-2 bg-white text-red-500 p-2 rounded-full hidden shadow-lg border border-red-100"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-width="3"/></svg></button>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="px-6 pb-12">
-                <button id="final-submit" onclick="window.confirmSubmitFlow()" class="w-full pill-glass-3d !bg-slate-900 !text-white py-6 font-black text-xl tracking-[0.2em] shadow-2xl opacity-50 pointer-events-none">KIRIM ABSENSI</button>
+                <button id="final-submit" onclick="confirmSubmitFlow()" class="w-full pill-glass-3d !bg-slate-900 !text-white py-6 font-black text-xl tracking-[0.2em] shadow-2xl opacity-50 pointer-events-none">KIRIM ABSENSI</button>
             </div>
         </div>
     </div>
 
-    <script type="module">
-        // Global Variables & Fallbacks for local testing
+    <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbzE8Ko__c6BgxbYIfz0Uvres49hsZ3yo_3JJ0eu6BbQVckKCqeL4Dhyu8bLSZsoZJ3qlw/exec";
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'upt-psda-pro';
-        
-        let firebaseConfig = null;
-        try {
-            firebaseConfig = (typeof __firebase_config !== 'undefined' && __firebase_config) ? JSON.parse(__firebase_config) : null;
-        } catch(e) { console.error("Config parse error"); }
-
-        // Firebase State
-        let db, auth, user;
         let currentUser = null, currentScreen = 'login-screen', selectedStatus = "", coordinates = "", selfieRaw = null, kerjaRaw = null, activeCameraMode = null, profilePhotoRaw = null;
         let serverTime = null, dailyStatus = { hasHadir: false, hasPulang: false, hasSpecial: false, hasMargin: false };
 
-        const { initializeApp, getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken, getFirestore, doc, setDoc, getDoc } = window.firebaseInit;
-
-        // UI Helpers
-        window.showToast = (msg, type = "info", title = "Pemberitahuan") => {
+        function showToast(msg, type = "info", title = "Pemberitahuan") {
             const toast = document.getElementById('toast-element');
             const box = document.getElementById('toast-icon-box');
             document.getElementById('toast-text').innerText = msg;
@@ -359,83 +330,32 @@
             box.className = "w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg " + (type === "success" ? "bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.5)]" : "bg-red-500 shadow-[0_0_20px_rgba(239,68,68,0.5)]");
             box.innerText = type === "success" ? "✓" : "!";
             toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 4500);
-        };
+            setTimeout(() => toast.classList.remove('show'), 5000);
+        }
 
-        window.closeModal = () => { document.getElementById('modal-confirm').style.display = 'none'; };
-        window.showLoading = (s, text = "Sinkronisasi Server...") => { 
+        function closeModal() { document.getElementById('modal-confirm').style.display = 'none'; }
+        function showLoading(s, text = "Sinkronisasi Server...") { 
             const loader = document.getElementById('global-loader');
             document.getElementById('loader-text').innerText = text;
             loader.style.display = s ? 'flex' : 'none'; 
-        };
+        }
         
-        window.navigateTo = (id) => {
+        function navigateTo(id) {
             const cur = document.getElementById(currentScreen), next = document.getElementById(id);
-            if (!next) return;
             cur.classList.remove('screen-active'); cur.classList.add('screen-prev');
             next.classList.remove('screen-hidden', 'screen-prev'); next.classList.add('screen-active');
             currentScreen = id;
-        };
-
-        // Initialize Firebase ONLY if config is valid
-        if (firebaseConfig && firebaseConfig.apiKey) {
-            try {
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-
-                onAuthStateChanged(auth, async (u) => {
-                    user = u;
-                    if (user) {
-                        const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'session', 'login_data');
-                        try {
-                            const docSnap = await getDoc(docRef);
-                            if (docSnap.exists()) {
-                                const data = docSnap.data();
-                                document.getElementById('login-username').value = data.username || "";
-                                document.getElementById('login-password').value = data.password || "";
-                                document.getElementById('save-session').checked = true;
-                            }
-                        } catch (e) { console.error("Session load error:", e); }
-                    } else {
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                            await signInWithCustomToken(auth, __initial_auth_token);
-                        } else {
-                            await signInAnonymously(auth);
-                        }
-                    }
-                });
-            } catch (e) {
-                console.error("Firebase init failed:", e);
-                window.showToast("Cloud Storage non-aktif (lokal)", "info");
-            }
-        } else {
-            console.warn("Firebase config missing or invalid.");
-            window.showToast("Berjalan tanpa Cloud Session", "info");
         }
 
-        // Auth Logic
-        window.handleLogin = async () => {
-            const username = document.getElementById('login-username').value;
-            const password = document.getElementById('login-password').value;
-            const saveCheck = document.getElementById('save-session').checked;
-
-            if (!username || !password) return window.showToast("Lengkapi form login.", "error");
+        async function handleLogin() {
+            const user = document.getElementById('login-username').value, pass = document.getElementById('login-password').value;
+            if (!user || !pass) return showToast("Masukkan kredensial lengkap.", "error");
             
-            window.showLoading(true, "Memvalidasi Akun...");
+            showLoading(true, "Memvalidasi Akun...");
             try {
-                const response = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "login", username, password }) });
+                const response = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "login", username: user, password: pass }) });
                 const res = await response.json();
-                
                 if (res.status === "success") {
-                    if (db && user && saveCheck) {
-                        const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'session', 'login_data');
-                        await setDoc(docRef, { username, password, updatedAt: new Date().toISOString() });
-                    } else if (db && user) {
-                        const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'session', 'login_data');
-                        await setDoc(docRef, {});
-                    }
-
                     currentUser = res.data;
                     document.getElementById('user-name').innerText = currentUser.Nama;
                     document.getElementById('user-job').innerText = currentUser.Jabatan;
@@ -445,20 +365,17 @@
                     dailyStatus = await statusResp.json();
                     
                     applyBusinessRules();
-                    window.navigateTo('presensi-screen');
-                    window.showToast("Login Berhasil.", "success", "Selamat Datang");
-                } else window.showToast(res.message, "error");
-            } catch (e) { 
-                console.error(e);
-                window.showToast("Server tidak merespon.", "error"); 
-            }
-            window.showLoading(false);
-        };
+                    navigateTo('presensi-screen');
+                    showToast("Sesi Sinkron. Kunci lokasi GPS Anda.", "success", "Login Berhasil");
+                } else showToast(res.message, "error");
+            } catch (e) { showToast("Gagal terhubung ke server. Cek koneksi.", "error"); }
+            showLoading(false);
+        }
 
         function applyBusinessRules() {
             if (dailyStatus.hasSpecial) {
                 document.querySelectorAll('.status-btn').forEach(b => b.disabled = true);
-                window.showToast("Anda sudah absen khusus hari ini.", "error", "Aturan Harian");
+                showToast("Anda sudah absen khusus (Izin/Sakit/Cuti/Dinas). Akses hari ini ditutup.", "error", "Aturan Harian");
                 return;
             }
             document.getElementById('btn-hadir').disabled = dailyStatus.hasHadir;
@@ -466,9 +383,20 @@
             document.getElementById('btn-margin').disabled = dailyStatus.hasHadir || dailyStatus.hasMargin;
         }
 
-        window.getRealLocation = () => {
-            if (!navigator.geolocation) return window.showToast("GPS tidak didukung.", "error", "Error GPS");
-            window.showLoading(true, "Mencari Lokasi...");
+        async function getRealLocation() {
+            if (!navigator.geolocation) {
+                return showToast("GPS tidak didukung di browser ini.", "error", "Error GPS");
+            }
+
+            showLoading(true, "Mencari Koordinat GPS...");
+            
+            // Pengaturan GPS diperkuat untuk HP
+            const geoOptions = {
+                enableHighAccuracy: true,
+                timeout: 35000, // Timeout ditingkatkan ke 35 detik
+                maximumAge: 0
+            };
+
             navigator.geolocation.getCurrentPosition(async (p) => {
                 coordinates = `${p.coords.latitude}, ${p.coords.longitude}`;
                 document.getElementById('gps-text').innerText = "GPS TERKUNCI";
@@ -481,50 +409,64 @@
                     const tResp = await fetch(API_URL + "?action=getServerTime");
                     const tData = await tResp.json();
                     serverTime = tData.formattedTime;
+                    
                     const [h, m] = serverTime.split(':').map(Number);
-                    if (h * 60 + m > 450) window.showToast(`Terlambat: ${h * 60 + m - 450} menit.`, "error", "Waktu Server");
-                    else window.showToast("Waktu sinkron.", "success", "GPS Aktif");
-                } catch(e) { serverTime = new Date().toLocaleTimeString('id-ID', {hour12: false}); }
-                window.showLoading(false);
+                    const currentMinutes = h * 60 + m;
+                    if (currentMinutes > 450) { 
+                        const late = currentMinutes - 450;
+                        showToast(`Deteksi Keterlambatan: ${late} menit. Gunakan Margin Error jika diperlukan.`, "error", "Waktu Server");
+                    } else {
+                        showToast("Koordinat dan waktu sinkron.", "success", "GPS Aktif");
+                    }
+                } catch(e) { 
+                    serverTime = new Date().toLocaleTimeString('id-ID', {hour12: false}); 
+                }
+                showLoading(false);
             }, (err) => { 
-                window.showLoading(false); 
-                window.showToast("Gagal lokasi. Aktifkan GPS browser.", "error", "GPS Gagal"); 
-            }, { enableHighAccuracy: true, timeout: 35000 });
-        };
+                showLoading(false); 
+                let msg = "Gagal mengambil lokasi.";
+                if (err.code === 1) msg = "Izin ditolak. Silakan aktifkan Lokasi di Pengaturan HP > Browser.";
+                else if (err.code === 2) msg = "Lokasi tidak ditemukan. Pastikan GPS HP aktif dan Anda di luar ruangan.";
+                else if (err.code === 3) msg = "Waktu habis (Timeout). Pastikan sinyal GPS kuat atau coba di area terbuka.";
+                showToast(msg, "error", "GPS Gagal"); 
+            }, geoOptions);
+        }
 
-        window.setStatus = (s, el) => {
+        function setStatus(s, el) {
+            // Urutan Logika: Harus Hadir/Margin sebelum Pulang
             if (s === 'Pulang' && !dailyStatus.hasHadir && !dailyStatus.hasMargin && selectedStatus !== 'Margin Error') {
-                return window.showToast("Hadir/Margin Error dulu baru Pulang.", "error", "Logika Urutan");
+                return showToast("Pulang ditolak. Anda wajib absen Hadir atau Margin Error terlebih dahulu hari ini.", "error", "Logika Urutan");
             }
+
             selectedStatus = s;
             document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active-hadir', 'active-pulang', 'active-special', 'active-error'));
             const cls = (s === 'Hadir') ? 'active-hadir' : (s === 'Pulang' ? 'active-pulang' : (s === 'Margin Error' ? 'active-error' : 'active-special'));
             el.classList.add(cls);
+            
             document.getElementById('status-v').classList.remove('hidden');
             document.getElementById('duration-box').classList.toggle('hidden', !['Izin', 'Cuti', 'Sakit', 'Dinas'].includes(s));
-            window.validateForm();
-        };
+            validateForm();
+        }
 
-        window.openCamera = async (mode) => {
+        async function openCamera(mode) {
             activeCameraMode = mode;
             document.getElementById('camera-overlay').style.display = 'flex';
             const constraints = { video: { facingMode: (mode === 'kerja') ? 'environment' : 'user' } };
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia(constraints);
-                document.getElementById('video-preview').srcObject = stream;
-            } catch(e) { window.showToast("Izin kamera ditolak", "error"); window.closeCamera(); }
-        };
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
+            document.getElementById('video-preview').srcObject = stream;
+        }
 
-        window.closeCamera = () => {
+        function closeCamera() {
             const v = document.getElementById('video-preview');
             if (v.srcObject) v.srcObject.getTracks().forEach(t => t.stop());
             document.getElementById('camera-overlay').style.display = 'none';
-        };
+        }
 
-        window.takePicture = () => {
+        function takePicture() {
             const v = document.getElementById('video-preview'), c = document.createElement('canvas');
             const ctx = c.getContext('2d');
             c.width = 600; c.height = 900;
+            
             const sW = v.videoWidth, sH = v.videoHeight;
             const targetRatio = 0.666;
             let dW, dH, dX, dY;
@@ -532,13 +474,14 @@
             else { dW = sW; dH = sW / targetRatio; dX = 0; dY = (sH - dH) / 2; }
             ctx.drawImage(v, dX, dY, dW, dH, 0, 0, 600, 900);
             
+            // Professional Watermark
             ctx.fillStyle = "rgba(0, 0, 0, 0.65)";
             ctx.fillRect(0, 720, 600, 180);
             ctx.fillStyle = "white";
             ctx.font = "bold 28px Poppins"; ctx.fillText((currentUser ? currentUser.Nama : "REGISTRASI").toUpperCase(), 30, 770);
-            ctx.font = "18px Poppins"; ctx.fillText((currentUser ? currentUser.Jabatan : "CALON") + " | " + selectedStatus.toUpperCase(), 30, 805);
-            ctx.font = "14px Poppins"; ctx.fillText("WIB: " + (serverTime || "SYNC...") + " | KOOR: " + coordinates, 30, 840);
-            ctx.fillStyle = "#10b981"; ctx.font = "bold 12px Poppins"; ctx.fillText("✓ UPT PSDA VERIFIED IMAGE", 30, 875);
+            ctx.font = "18px Poppins"; ctx.fillText((currentUser ? currentUser.Jabatan : "CALON PEGAWAI") + " | " + selectedStatus.toUpperCase(), 30, 805);
+            ctx.font = "14px Poppins"; ctx.fillText("WIB: " + (serverTime || "MENCARI...") + " | KOOR: " + coordinates, 30, 840);
+            ctx.fillStyle = "#10b981"; ctx.font = "bold 12px Poppins"; ctx.fillText("✓ UPT PSDA VERIFIED IMAGE SYSTEM", 30, 875);
 
             const data = c.toDataURL('image/jpeg', 0.8);
             if (activeCameraMode === 'profile') {
@@ -556,11 +499,11 @@
                 document.getElementById('preview-kerja').querySelector('img').src = data;
                 document.getElementById('retry-kerja').classList.remove('hidden');
             }
-            window.closeCamera();
-            window.validateForm();
-        };
+            closeCamera();
+            validateForm();
+        }
 
-        window.validateForm = () => {
+        function validateForm() {
             const notes = document.getElementById('attendance-notes').value;
             const hasNotes = notes.length >= 5;
             const hasMedia = (selfieRaw && kerjaRaw);
@@ -572,25 +515,25 @@
             } else {
                 btn.classList.replace('opacity-100', 'opacity-50'); btn.classList.add('pointer-events-none');
             }
-        };
+        }
 
-        window.confirmSubmitFlow = () => {
-            if (["Hadir", "Pulang"].includes(selectedStatus)) { window.submitAttendance(); return; }
-            let msg = `Kirim status "${selectedStatus.toUpperCase()}"? `;
+        function confirmSubmitFlow() {
+            if (["Hadir", "Pulang"].includes(selectedStatus)) { submitAttendance(); return; }
+            let msg = `Kirim status "${selectedStatus.toUpperCase()}" sekarang? `;
             switch(selectedStatus) {
-                case 'Izin': msg += "Sertakan foto surat izin."; break;
-                case 'Sakit': msg += "Wajib surat dokter."; break;
-                case 'Dinas': msg += "Lampirkan surat dinas."; break;
-                case 'Cuti': msg += "Sertakan surat cuti."; break;
-                case 'Margin Error': msg += "Bukti hambatan & keterangan lengkap."; break;
+                case 'Izin': msg += "Mohon lampirkan foto Surat Izin Anda."; break;
+                case 'Sakit': msg += "Mohon lampirkan foto Surat Keterangan Dokter."; break;
+                case 'Dinas': msg += "Mohon lampirkan foto Surat Perintah Dinas."; break;
+                case 'Cuti': msg += "Mohon lampirkan foto Surat Izin Cuti resmi."; break;
+                case 'Margin Error': msg += "Foto kondisi/hambatan dengan jelas & tulis keterangan lengkap."; break;
             }
             document.getElementById('modal-msg').innerText = msg;
-            document.getElementById('confirm-submit-btn').onclick = () => { window.closeModal(); window.submitAttendance(); };
+            document.getElementById('confirm-submit-btn').onclick = () => { closeModal(); submitAttendance(); };
             document.getElementById('modal-confirm').style.display = 'flex';
-        };
+        }
 
-        window.submitAttendance = async () => {
-            window.showLoading(true, "Mengirim Data...");
+        async function submitAttendance() {
+            showLoading(true, "Mengirim Data Presensi...");
             const payload = {
                 action: "submitAttendance", nama: currentUser.Nama, jabatan: currentUser.Jabatan,
                 status: selectedStatus, koordinat: coordinates, fotoSelfie: selfieRaw,
@@ -599,14 +542,15 @@
             try {
                 const response = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
                 const res = await response.json();
-                if (res.status === "success") { window.showToast(res.message, "success", "Berhasil"); setTimeout(() => location.reload(), 4500); }
-                else window.showToast(res.message, "error", "Gagal");
-            } catch (e) { window.showToast("Error koneksi.", "error"); }
-            window.showLoading(false);
-        };
+                if (res.status === "success") { showToast(res.message, "success", "Berhasil"); setTimeout(() => location.reload(), 4500); }
+                else showToast(res.message, "error", "Gagal");
+            } catch (e) { showToast("Gagal mengirim data ke server.", "error"); }
+            showLoading(false);
+        }
 
-        window.toggleManual = (sel, id) => { document.getElementById(id).classList.toggle('hidden', sel.value !== 'manual'); };
-        window.handleFileUpload = (e) => {
+        // Utils
+        function toggleManual(sel, id) { document.getElementById(id).classList.toggle('hidden', sel.value !== 'manual'); }
+        function handleFileUpload(e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
@@ -618,9 +562,9 @@
                 };
                 reader.readAsDataURL(file);
             }
-        };
+        }
 
-        window.handleRegister = async () => {
+        async function handleRegister() {
             const j = document.getElementById('reg-jabatan').value, w = document.getElementById('reg-wilayah').value;
             const payload = {
                 action: "register", ID: document.getElementById('reg-id').value, Nama: document.getElementById('reg-nama').value,
@@ -630,27 +574,27 @@
                 LokasiPenempatan: document.getElementById('reg-lokasi').value, Password: document.getElementById('reg-password').value,
                 FotoUrl: profilePhotoRaw
             };
-            if (!payload.Nama || !profilePhotoRaw) return window.showToast("Foto & Nama wajib.", "error");
-            window.showLoading(true, "Mendaftar...");
+            if (!payload.Nama || !profilePhotoRaw) return showToast("Foto profil & Nama wajib diisi.", "error");
+            showLoading(true, "Mendaftarkan Pegawai...");
             try {
                 const res = await (await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) })).json();
-                if (res.status === "success") { window.showToast("Pendaftaran Berhasil!", "success"); setTimeout(() => window.navigateTo('login-screen'), 3000); }
-                else window.showToast(res.message, "error");
-            } catch (e) { window.showToast("Error koneksi.", "error"); }
-            window.showLoading(false);
-        };
+                if (res.status === "success") { showToast("Pendaftaran Berhasil!", "success", "Sistem"); setTimeout(() => navigateTo('login-screen'), 3000); }
+                else showToast(res.message, "error");
+            } catch (e) { showToast("Gagal terhubung ke server.", "error"); }
+            showLoading(false);
+        }
 
-        window.handleForgotPassword = async () => {
+        async function handleForgotPassword() {
             const inp = document.getElementById('forgot-input').value;
-            if(!inp) return window.showToast("Isi kontak.", "error");
-            window.showLoading(true, "Mengecek...");
+            if(!inp) return showToast("Masukkan kontak terdaftar.", "error");
+            showLoading(true, "Mengecek Database...");
             try {
                 const res = await (await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "forgotPassword", input: inp }) })).json();
-                window.showToast(res.message, "success", "Berhasil");
-                setTimeout(() => window.navigateTo('login-screen'), 3000);
-            } catch (e) { window.showToast("Permintaan gagal.", "error"); }
-            window.showLoading(false);
-        };
+                showToast(res.message, "success", "Berhasil");
+                setTimeout(() => navigateTo('login-screen'), 3000);
+            } catch (e) { showToast("Permintaan gagal.", "error"); }
+            showLoading(false);
+        }
     </script>
 </body>
 </html>
