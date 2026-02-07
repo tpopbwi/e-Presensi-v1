@@ -189,18 +189,18 @@
                     <label for="save-session" class="text-[10px] font-black text-slate-600 uppercase tracking-widest cursor-pointer">Simpan Sesi Login</label>
                 </div>
 
-                <button id="login-btn-action" onclick="handleLogin()" class="w-full pill-glass-3d py-4 bg-slate-900 text-white font-black text-lg shadow-[0_6px_0_#000]">MASUK</button>
+                <button id="login-btn-action" onclick="window.handleLogin()" class="w-full pill-glass-3d py-4 bg-slate-900 text-white font-black text-lg shadow-[0_6px_0_#000]">MASUK</button>
             </div>
             <div class="flex justify-between items-end pb-4 pt-10 px-2">
-                <button onclick="navigateTo('forgot-screen')" class="text-left group focus:outline-none"><p class="text-slate-800 font-bold text-xs leading-none">Password</p><p class="text-[10px] text-slate-500 uppercase group-hover:underline">Lupa Sandi?</p></button>
-                <button onclick="navigateTo('register-screen')" class="text-right group focus:outline-none"><p class="text-emerald-700 font-bold text-xs leading-none">Register</p><p class="text-[10px] text-slate-500 uppercase underline">Daftar Akun</p></button>
+                <button onclick="window.navigateTo('forgot-screen')" class="text-left group focus:outline-none"><p class="text-slate-800 font-bold text-xs leading-none">Password</p><p class="text-[10px] text-slate-500 uppercase group-hover:underline">Lupa Sandi?</p></button>
+                <button onclick="window.navigateTo('register-screen')" class="text-right group focus:outline-none"><p class="text-emerald-700 font-bold text-xs leading-none">Register</p><p class="text-[10px] text-slate-500 uppercase underline">Daftar Akun</p></button>
             </div>
         </div>
 
         <!-- SCREEN: REGISTER -->
         <div id="register-screen" class="screen screen-hidden overflow-y-auto scrollbar-hide">
-            <div class="flex items-center gap-4 mb-8" onclick="navigateTo('login-screen')">
-                <div class="p-2 bg-slate-900/10 rounded-xl"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg></div>
+            <div class="flex items-center gap-4 mb-8" onclick="window.navigateTo('login-screen')">
+                <div class="p-2 bg-slate-900/10 rounded-xl"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="3"/></svg></div>
                 <h2 class="text-xl font-black text-slate-800 tracking-tight">Pendaftaran Pegawai</h2>
             </div>
             <div class="space-y-6 pb-12">
@@ -212,20 +212,20 @@
                         </div>
                     </div>
                     <div class="flex gap-4">
-                        <button onclick="openCamera('profile')" class="pill-glass-3d p-3 bg-white/50 text-slate-700 flex items-center gap-2 text-xs font-bold"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Ambil Foto</button>
+                        <button onclick="window.openCamera('profile')" class="pill-glass-3d p-3 bg-white/50 text-slate-700 flex items-center gap-2 text-xs font-bold"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Ambil Foto</button>
                         <button onclick="document.getElementById('file-upload-profile').click()" class="pill-glass-3d p-3 bg-white/50 text-slate-700 flex items-center gap-2 text-xs font-bold"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>Unggah</button>
-                        <input type="file" id="file-upload-profile" class="hidden" accept="image/*" onchange="handleFileUpload(event)">
+                        <input type="file" id="file-upload-profile" class="hidden" accept="image/*" onchange="window.handleFileUpload(event)">
                     </div>
                 </div>
                 <div class="space-y-4">
                     <input id="reg-id" type="text" placeholder="ID Pegawai (Contoh: P001)" class="input-glass">
                     <input id="reg-nama" type="text" placeholder="Nama Lengkap" class="input-glass">
-                    <select id="reg-jabatan" class="input-glass" onchange="toggleManual(this, 'manual-jabatan')">
+                    <select id="reg-jabatan" class="input-glass" onchange="window.toggleManual(this, 'manual-jabatan')">
                         <option value="" disabled selected>Pilih Jabatan</option>
                         <option value="PPA">PPA</option><option value="Pekarya">Pekarya</option><option value="Staf Pengamat">Staf Pengamat</option><option value="manual">Isi manual...</option>
                     </select>
                     <input id="manual-jabatan" type="text" placeholder="Ketik Jabatan" class="input-glass hidden border-emerald-400">
-                    <select id="reg-wilayah" class="input-glass" onchange="toggleManual(this, 'manual-wilayah')">
+                    <select id="reg-wilayah" class="input-glass" onchange="window.toggleManual(this, 'manual-wilayah')">
                         <option value="" disabled selected>Pilih Wilayah</option>
                         <option value="Bangorejo">Bangorejo</option><option value="Cluring">Cluring</option><option value="Pesanggaran">Pesanggaran</option><option value="Porolinggo">Porolinggo</option><option value="manual">Isi manual...</option>
                     </select>
@@ -235,14 +235,14 @@
                     <input id="reg-lokasi" type="text" placeholder="Lokasi Penempatan" class="input-glass">
                     <input id="reg-password" type="password" placeholder="Password Baru" class="input-glass">
                 </div>
-                <button onclick="handleRegister()" class="w-full pill-glass-3d py-5 bg-emerald-600 text-white font-black text-lg shadow-[0_6px_0_#064e3b]">DAFTAR SEKARANG</button>
+                <button onclick="window.handleRegister()" class="w-full pill-glass-3d py-5 bg-emerald-600 text-white font-black text-lg shadow-[0_6px_0_#064e3b]">DAFTAR SEKARANG</button>
             </div>
         </div>
 
         <!-- SCREEN: FORGOT PASSWORD -->
         <div id="forgot-screen" class="screen screen-hidden">
-            <div class="flex items-center gap-4 mb-10" onclick="navigateTo('login-screen')">
-                <div class="p-2 bg-slate-900/10 rounded-xl"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg></div>
+            <div class="flex items-center gap-4 mb-10" onclick="window.navigateTo('login-screen')">
+                <div class="p-2 bg-slate-900/10 rounded-xl"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="3"/></svg></div>
                 <h2 class="text-xl font-black text-slate-800">Reset Password</h2>
             </div>
             <div class="flex-1 flex flex-col justify-center space-y-6">
@@ -253,7 +253,7 @@
                     <p class="text-sm text-slate-600">Masukkan kontak terdaftar (Email/HP) untuk pemulihan.</p>
                 </div>
                 <input id="forgot-input" type="text" placeholder="Email / Nomor HP" class="input-glass">
-                <button onclick="handleForgotPassword()" class="w-full pill-glass-3d py-5 bg-amber-600 text-white font-black text-lg shadow-[0_6px_0_#92400e]">KIRIM PERMINTAAN</button>
+                <button onclick="window.handleForgotPassword()" class="w-full pill-glass-3d py-5 bg-amber-600 text-white font-black text-lg shadow-[0_6px_0_#92400e]">KIRIM PERMINTAAN</button>
             </div>
         </div>
 
@@ -276,22 +276,22 @@
             </div>
 
             <div class="px-6 mb-4">
-                <button id="lock-gps-btn" onclick="getRealLocation()" class="w-full pill-glass-3d py-5 bg-emerald-600 text-white font-black text-sm uppercase tracking-widest !shadow-[0_6px_0_#064e3b]">KUNCI LOKASI GPS (STEP 1)</button>
+                <button id="lock-gps-btn" onclick="window.getRealLocation()" class="w-full pill-glass-3d py-5 bg-emerald-600 text-white font-black text-sm uppercase tracking-widest !shadow-[0_6px_0_#064e3b]">KUNCI LOKASI GPS (STEP 1)</button>
             </div>
 
             <div id="attendance-form" class="locked-section space-y-8 bg-white/20 border-y border-white/40 py-10 px-6 shadow-2xl mb-8 w-full rounded-[55px]">
                 <div class="space-y-4">
                     <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Jenis Presensi <span id="status-v" class="step-check hidden ml-2">V Terpilih</span></label>
                     <div class="grid grid-cols-2 gap-4">
-                        <button id="btn-hadir" onclick="setStatus('Hadir', this)" class="status-btn pill-glass-3d py-6 font-black text-xs uppercase">Hadir</button>
-                        <button id="btn-pulang" onclick="setStatus('Pulang', this)" class="status-btn pill-glass-3d py-6 font-black text-xs uppercase">Pulang</button>
+                        <button id="btn-hadir" onclick="window.setStatus('Hadir', this)" class="status-btn pill-glass-3d py-6 font-black text-xs uppercase">Hadir</button>
+                        <button id="btn-pulang" onclick="window.setStatus('Pulang', this)" class="status-btn pill-glass-3d py-6 font-black text-xs uppercase">Pulang</button>
                     </div>
                     <div class="grid grid-cols-3 gap-3">
-                        <button id="btn-izin" onclick="setStatus('Izin', this)" class="status-btn pill-glass-3d py-4 font-bold text-[9px] uppercase">Izin</button>
-                        <button id="btn-cuti" onclick="setStatus('Cuti', this)" class="status-btn pill-glass-3d py-4 font-bold text-[9px] uppercase">Cuti</button>
-                        <button id="btn-sakit" onclick="setStatus('Sakit', this)" class="status-btn pill-glass-3d py-4 font-bold text-[9px] uppercase">Sakit</button>
-                        <button id="btn-dinas" onclick="setStatus('Dinas', this)" class="status-btn pill-glass-3d py-4 font-bold text-[9px] uppercase">Dinas</button>
-                        <button id="btn-margin" onclick="setStatus('Margin Error', this)" class="status-btn pill-glass-3d py-4 font-bold text-red-600 uppercase col-span-2 tracking-tighter">Margin Error</button>
+                        <button id="btn-izin" onclick="window.setStatus('Izin', this)" class="status-btn pill-glass-3d py-4 font-bold text-[9px] uppercase">Izin</button>
+                        <button id="btn-cuti" onclick="window.setStatus('Cuti', this)" class="status-btn pill-glass-3d py-4 font-bold text-[9px] uppercase">Cuti</button>
+                        <button id="btn-sakit" onclick="window.setStatus('Sakit', this)" class="status-btn pill-glass-3d py-4 font-bold text-[9px] uppercase">Sakit</button>
+                        <button id="btn-dinas" onclick="window.setStatus('Dinas', this)" class="status-btn pill-glass-3d py-4 font-bold text-[9px] uppercase">Dinas</button>
+                        <button id="btn-margin" onclick="window.setStatus('Margin Error', this)" class="status-btn pill-glass-3d py-4 font-bold text-red-600 uppercase col-span-2 tracking-tighter">Margin Error</button>
                     </div>
                     <div id="duration-box" class="hidden mt-4 bg-white/30 p-4 rounded-3xl border border-white/50">
                          <label class="text-[10px] font-black text-blue-700 uppercase mb-2 block tracking-widest text-center">Rentang Waktu (Hari)</label>
@@ -301,34 +301,34 @@
 
                 <div class="space-y-2">
                     <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Keterangan Aktivitas <span id="notes-v" class="step-check hidden ml-2">V Terisi</span></label>
-                    <textarea id="attendance-notes" oninput="validateForm()" class="input-glass !h-36 resize-none focus:outline-none" placeholder="Tulis catatan atau bukti kendala..."></textarea>
+                    <textarea id="attendance-notes" oninput="window.validateForm()" class="input-glass !h-36 resize-none focus:outline-none" placeholder="Tulis catatan atau bukti kendala..."></textarea>
                 </div>
 
                 <div class="space-y-4">
                     <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Dokumentasi <span id="media-v" class="step-check hidden ml-2">V Lengkap</span></label>
                     <div class="grid grid-cols-2 gap-5">
                         <div class="relative">
-                            <button onclick="openCamera('selfie')" class="w-full pill-glass-3d aspect-square flex flex-col items-center justify-center gap-2 overflow-hidden">
+                            <button onclick="window.openCamera('selfie')" class="w-full pill-glass-3d aspect-square flex flex-col items-center justify-center gap-2 overflow-hidden">
                                 <div id="preview-selfie" class="absolute inset-0 hidden"><img class="w-full h-full object-cover"></div>
                                 <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-width="1.5"/></svg>
                                 <span class="text-[9px] font-black uppercase text-slate-500">Selfie</span>
                             </button>
-                            <button id="retry-selfie" onclick="openCamera('selfie')" class="absolute -top-2 -right-2 bg-white text-red-500 p-2 rounded-full hidden shadow-lg border border-red-100"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-width="3"/></svg></button>
+                            <button id="retry-selfie" onclick="window.openCamera('selfie')" class="absolute -top-2 -right-2 bg-white text-red-500 p-2 rounded-full hidden shadow-lg border border-red-100"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-width="3"/></svg></button>
                         </div>
                         <div class="relative">
-                            <button onclick="openCamera('kerja')" class="w-full pill-glass-3d aspect-square flex flex-col items-center justify-center gap-2 overflow-hidden">
+                            <button onclick="window.openCamera('kerja')" class="w-full pill-glass-3d aspect-square flex flex-col items-center justify-center gap-2 overflow-hidden">
                                 <div id="preview-kerja" class="absolute inset-0 hidden"><img class="w-full h-full object-cover"></div>
                                 <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-width="1.5"/></svg>
                                 <span class="text-[9px] font-black uppercase text-slate-500">Lokasi</span>
                             </button>
-                            <button id="retry-kerja" onclick="openCamera('kerja')" class="absolute -top-2 -right-2 bg-white text-red-500 p-2 rounded-full hidden shadow-lg border border-red-100"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-width="3"/></svg></button>
+                            <button id="retry-kerja" onclick="window.openCamera('kerja')" class="absolute -top-2 -right-2 bg-white text-red-500 p-2 rounded-full hidden shadow-lg border border-red-100"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-width="3"/></svg></button>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="px-6 pb-12">
-                <button id="final-submit" onclick="confirmSubmitFlow()" class="w-full pill-glass-3d !bg-slate-900 !text-white py-6 font-black text-xl tracking-[0.2em] shadow-2xl opacity-50 pointer-events-none">KIRIM ABSENSI</button>
+                <button id="final-submit" onclick="window.confirmSubmitFlow()" class="w-full pill-glass-3d !bg-slate-900 !text-white py-6 font-black text-xl tracking-[0.2em] shadow-2xl opacity-50 pointer-events-none">KIRIM ABSENSI</button>
             </div>
         </div>
     </div>
@@ -338,51 +338,17 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbzE8Ko__c6BgxbYIfz0Uvres49hsZ3yo_3JJ0eu6BbQVckKCqeL4Dhyu8bLSZsoZJ3qlw/exec";
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'upt-psda-pro';
         
-        let firebaseConfig;
+        let firebaseConfig = null;
         try {
-            firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-                apiKey: "", authDomain: "", projectId: "", storageBucket: "", messagingSenderId: "", appId: ""
-            };
-        } catch(e) {
-            firebaseConfig = { apiKey: "", authDomain: "", projectId: "", storageBucket: "", messagingSenderId: "", appId: "" };
-        }
+            firebaseConfig = (typeof __firebase_config !== 'undefined' && __firebase_config) ? JSON.parse(__firebase_config) : null;
+        } catch(e) { console.error("Config parse error"); }
 
         // Firebase State
         let db, auth, user;
         let currentUser = null, currentScreen = 'login-screen', selectedStatus = "", coordinates = "", selfieRaw = null, kerjaRaw = null, activeCameraMode = null, profilePhotoRaw = null;
         let serverTime = null, dailyStatus = { hasHadir: false, hasPulang: false, hasSpecial: false, hasMargin: false };
 
-        // Initialize Firebase
         const { initializeApp, getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken, getFirestore, doc, setDoc, getDoc } = window.firebaseInit;
-        const app = initializeApp(firebaseConfig);
-        auth = getAuth(app);
-        db = getFirestore(app);
-
-        // Auth Listener & Session Loader
-        onAuthStateChanged(auth, async (u) => {
-            user = u;
-            if (user) {
-                // Perbaikan Jalur Dokumen: Harus berjumlah genap (6 segmen)
-                const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'session', 'login_data');
-                try {
-                    const docSnap = await getDoc(docRef);
-                    if (docSnap.exists()) {
-                        const data = docSnap.data();
-                        document.getElementById('login-username').value = data.username || "";
-                        document.getElementById('login-password').value = data.password || "";
-                        document.getElementById('save-session').checked = true;
-                    }
-                } catch (e) { console.error("Firestore error:", e); }
-            } else {
-                try {
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
-                } catch (e) { console.error("Auth error:", e); }
-            }
-        });
 
         // UI Helpers
         window.showToast = (msg, type = "info", title = "Pemberitahuan") => {
@@ -405,10 +371,48 @@
         
         window.navigateTo = (id) => {
             const cur = document.getElementById(currentScreen), next = document.getElementById(id);
+            if (!next) return;
             cur.classList.remove('screen-active'); cur.classList.add('screen-prev');
             next.classList.remove('screen-hidden', 'screen-prev'); next.classList.add('screen-active');
             currentScreen = id;
         };
+
+        // Initialize Firebase ONLY if config is valid
+        if (firebaseConfig && firebaseConfig.apiKey) {
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                onAuthStateChanged(auth, async (u) => {
+                    user = u;
+                    if (user) {
+                        const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'session', 'login_data');
+                        try {
+                            const docSnap = await getDoc(docRef);
+                            if (docSnap.exists()) {
+                                const data = docSnap.data();
+                                document.getElementById('login-username').value = data.username || "";
+                                document.getElementById('login-password').value = data.password || "";
+                                document.getElementById('save-session').checked = true;
+                            }
+                        } catch (e) { console.error("Session load error:", e); }
+                    } else {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    }
+                });
+            } catch (e) {
+                console.error("Firebase init failed:", e);
+                window.showToast("Cloud Storage non-aktif (lokal)", "info");
+            }
+        } else {
+            console.warn("Firebase config missing or invalid.");
+            window.showToast("Berjalan tanpa Cloud Session", "info");
+        }
 
         // Auth Logic
         window.handleLogin = async () => {
@@ -416,18 +420,18 @@
             const password = document.getElementById('login-password').value;
             const saveCheck = document.getElementById('save-session').checked;
 
-            if (!username || !password) return showToast("Lengkapi form login.", "error");
+            if (!username || !password) return window.showToast("Lengkapi form login.", "error");
             
-            showLoading(true, "Memvalidasi Akun...");
+            window.showLoading(true, "Memvalidasi Akun...");
             try {
-                const response = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "login", username: username, password: password }) });
+                const response = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "login", username, password }) });
                 const res = await response.json();
                 
                 if (res.status === "success") {
-                    if (user && saveCheck) {
+                    if (db && user && saveCheck) {
                         const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'session', 'login_data');
                         await setDoc(docRef, { username, password, updatedAt: new Date().toISOString() });
-                    } else if (user) {
+                    } else if (db && user) {
                         const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'session', 'login_data');
                         await setDoc(docRef, {});
                     }
@@ -441,18 +445,20 @@
                     dailyStatus = await statusResp.json();
                     
                     applyBusinessRules();
-                    navigateTo('presensi-screen');
-                    showToast("Login Berhasil.", "success", "Selamat Datang");
-                } else showToast(res.message, "error");
-            } catch (e) { showToast("Server tidak merespon.", "error"); }
-            showLoading(false);
+                    window.navigateTo('presensi-screen');
+                    window.showToast("Login Berhasil.", "success", "Selamat Datang");
+                } else window.showToast(res.message, "error");
+            } catch (e) { 
+                console.error(e);
+                window.showToast("Server tidak merespon.", "error"); 
+            }
+            window.showLoading(false);
         };
 
-        // Business Logic
         function applyBusinessRules() {
             if (dailyStatus.hasSpecial) {
                 document.querySelectorAll('.status-btn').forEach(b => b.disabled = true);
-                showToast("Absensi harian ditolak karena sudah absen khusus.", "error", "Aturan Harian");
+                window.showToast("Anda sudah absen khusus hari ini.", "error", "Aturan Harian");
                 return;
             }
             document.getElementById('btn-hadir').disabled = dailyStatus.hasHadir;
@@ -461,8 +467,8 @@
         }
 
         window.getRealLocation = () => {
-            if (!navigator.geolocation) return showToast("GPS tidak didukung.", "error", "Error GPS");
-            showLoading(true, "Mencari Lokasi...");
+            if (!navigator.geolocation) return window.showToast("GPS tidak didukung.", "error", "Error GPS");
+            window.showLoading(true, "Mencari Lokasi...");
             navigator.geolocation.getCurrentPosition(async (p) => {
                 coordinates = `${p.coords.latitude}, ${p.coords.longitude}`;
                 document.getElementById('gps-text').innerText = "GPS TERKUNCI";
@@ -476,19 +482,19 @@
                     const tData = await tResp.json();
                     serverTime = tData.formattedTime;
                     const [h, m] = serverTime.split(':').map(Number);
-                    if (h * 60 + m > 450) showToast(`Terlambat: ${h * 60 + m - 450} menit.`, "error", "Waktu Server");
-                    else showToast("Waktu sinkron.", "success", "GPS Aktif");
+                    if (h * 60 + m > 450) window.showToast(`Terlambat: ${h * 60 + m - 450} menit.`, "error", "Waktu Server");
+                    else window.showToast("Waktu sinkron.", "success", "GPS Aktif");
                 } catch(e) { serverTime = new Date().toLocaleTimeString('id-ID', {hour12: false}); }
-                showLoading(false);
+                window.showLoading(false);
             }, (err) => { 
-                showLoading(false); 
-                showToast("Gagal mengambil lokasi. Izinkan GPS browser.", "error", "GPS Gagal"); 
+                window.showLoading(false); 
+                window.showToast("Gagal lokasi. Aktifkan GPS browser.", "error", "GPS Gagal"); 
             }, { enableHighAccuracy: true, timeout: 35000 });
         };
 
         window.setStatus = (s, el) => {
             if (s === 'Pulang' && !dailyStatus.hasHadir && !dailyStatus.hasMargin && selectedStatus !== 'Margin Error') {
-                return showToast("Hadir/Margin Error dulu baru Pulang.", "error", "Logika Urutan");
+                return window.showToast("Hadir/Margin Error dulu baru Pulang.", "error", "Logika Urutan");
             }
             selectedStatus = s;
             document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active-hadir', 'active-pulang', 'active-special', 'active-error'));
@@ -496,15 +502,17 @@
             el.classList.add(cls);
             document.getElementById('status-v').classList.remove('hidden');
             document.getElementById('duration-box').classList.toggle('hidden', !['Izin', 'Cuti', 'Sakit', 'Dinas'].includes(s));
-            validateForm();
+            window.validateForm();
         };
 
         window.openCamera = async (mode) => {
             activeCameraMode = mode;
             document.getElementById('camera-overlay').style.display = 'flex';
             const constraints = { video: { facingMode: (mode === 'kerja') ? 'environment' : 'user' } };
-            const stream = await navigator.mediaDevices.getUserMedia(constraints);
-            document.getElementById('video-preview').srcObject = stream;
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                document.getElementById('video-preview').srcObject = stream;
+            } catch(e) { window.showToast("Izin kamera ditolak", "error"); window.closeCamera(); }
         };
 
         window.closeCamera = () => {
@@ -528,7 +536,7 @@
             ctx.fillRect(0, 720, 600, 180);
             ctx.fillStyle = "white";
             ctx.font = "bold 28px Poppins"; ctx.fillText((currentUser ? currentUser.Nama : "REGISTRASI").toUpperCase(), 30, 770);
-            ctx.font = "18px Poppins"; ctx.fillText((currentUser ? currentUser.Jabatan : "CALON PEGAWAI") + " | " + selectedStatus.toUpperCase(), 30, 805);
+            ctx.font = "18px Poppins"; ctx.fillText((currentUser ? currentUser.Jabatan : "CALON") + " | " + selectedStatus.toUpperCase(), 30, 805);
             ctx.font = "14px Poppins"; ctx.fillText("WIB: " + (serverTime || "SYNC...") + " | KOOR: " + coordinates, 30, 840);
             ctx.fillStyle = "#10b981"; ctx.font = "bold 12px Poppins"; ctx.fillText("✓ UPT PSDA VERIFIED IMAGE", 30, 875);
 
@@ -548,8 +556,8 @@
                 document.getElementById('preview-kerja').querySelector('img').src = data;
                 document.getElementById('retry-kerja').classList.remove('hidden');
             }
-            closeCamera();
-            validateForm();
+            window.closeCamera();
+            window.validateForm();
         };
 
         window.validateForm = () => {
@@ -567,22 +575,22 @@
         };
 
         window.confirmSubmitFlow = () => {
-            if (["Hadir", "Pulang"].includes(selectedStatus)) { submitAttendance(); return; }
+            if (["Hadir", "Pulang"].includes(selectedStatus)) { window.submitAttendance(); return; }
             let msg = `Kirim status "${selectedStatus.toUpperCase()}"? `;
             switch(selectedStatus) {
                 case 'Izin': msg += "Sertakan foto surat izin."; break;
                 case 'Sakit': msg += "Wajib surat dokter."; break;
                 case 'Dinas': msg += "Lampirkan surat dinas."; break;
                 case 'Cuti': msg += "Sertakan surat cuti."; break;
-                case 'Margin Error': msg += "Foto bukti hambatan & keterangan lengkap."; break;
+                case 'Margin Error': msg += "Bukti hambatan & keterangan lengkap."; break;
             }
             document.getElementById('modal-msg').innerText = msg;
-            document.getElementById('confirm-submit-btn').onclick = () => { closeModal(); submitAttendance(); };
+            document.getElementById('confirm-submit-btn').onclick = () => { window.closeModal(); window.submitAttendance(); };
             document.getElementById('modal-confirm').style.display = 'flex';
         };
 
-        async function submitAttendance() {
-            showLoading(true, "Mengirim Data...");
+        window.submitAttendance = async () => {
+            window.showLoading(true, "Mengirim Data...");
             const payload = {
                 action: "submitAttendance", nama: currentUser.Nama, jabatan: currentUser.Jabatan,
                 status: selectedStatus, koordinat: coordinates, fotoSelfie: selfieRaw,
@@ -591,13 +599,12 @@
             try {
                 const response = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
                 const res = await response.json();
-                if (res.status === "success") { showToast(res.message, "success", "Berhasil"); setTimeout(() => location.reload(), 4500); }
-                else showToast(res.message, "error", "Gagal");
-            } catch (e) { showToast("Error koneksi.", "error"); }
-            showLoading(false);
-        }
+                if (res.status === "success") { window.showToast(res.message, "success", "Berhasil"); setTimeout(() => location.reload(), 4500); }
+                else window.showToast(res.message, "error", "Gagal");
+            } catch (e) { window.showToast("Error koneksi.", "error"); }
+            window.showLoading(false);
+        };
 
-        // Registration & File Utils
         window.toggleManual = (sel, id) => { document.getElementById(id).classList.toggle('hidden', sel.value !== 'manual'); };
         window.handleFileUpload = (e) => {
             const file = e.target.files[0];
@@ -623,26 +630,26 @@
                 LokasiPenempatan: document.getElementById('reg-lokasi').value, Password: document.getElementById('reg-password').value,
                 FotoUrl: profilePhotoRaw
             };
-            if (!payload.Nama || !profilePhotoRaw) return showToast("Foto profil & Nama wajib.", "error");
-            showLoading(true, "Mendaftar...");
+            if (!payload.Nama || !profilePhotoRaw) return window.showToast("Foto & Nama wajib.", "error");
+            window.showLoading(true, "Mendaftar...");
             try {
                 const res = await (await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) })).json();
-                if (res.status === "success") { showToast("Pendaftaran Berhasil!", "success"); setTimeout(() => navigateTo('login-screen'), 3000); }
-                else showToast(res.message, "error");
-            } catch (e) { showToast("Gagal mendaftar.", "error"); }
-            showLoading(false);
+                if (res.status === "success") { window.showToast("Pendaftaran Berhasil!", "success"); setTimeout(() => window.navigateTo('login-screen'), 3000); }
+                else window.showToast(res.message, "error");
+            } catch (e) { window.showToast("Error koneksi.", "error"); }
+            window.showLoading(false);
         };
 
         window.handleForgotPassword = async () => {
             const inp = document.getElementById('forgot-input').value;
-            if(!inp) return showToast("Isi kontak.", "error");
-            showLoading(true, "Mengecek...");
+            if(!inp) return window.showToast("Isi kontak.", "error");
+            window.showLoading(true, "Mengecek...");
             try {
                 const res = await (await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "forgotPassword", input: inp }) })).json();
-                showToast(res.message, "success", "Berhasil");
-                setTimeout(() => navigateTo('login-screen'), 3000);
-            } catch (e) { showToast("Gagal.", "error"); }
-            showLoading(false);
+                window.showToast(res.message, "success", "Berhasil");
+                setTimeout(() => window.navigateTo('login-screen'), 3000);
+            } catch (e) { window.showToast("Permintaan gagal.", "error"); }
+            window.showLoading(false);
         };
     </script>
 </body>
