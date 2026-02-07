@@ -6,14 +6,13 @@
     <title>UPT PSDA - Pro Attendance System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- QR Scanner Library -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
     
-    <!-- Firebase SDK (Hanya untuk Auth/Database utama, sesi disimpan lokal) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        window.firebaseInit = { initializeApp, getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken, getFirestore, doc, setDoc, getDoc };
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        window.firebaseInit = { initializeApp, getAuth, signInAnonymously, onAuthStateChanged };
     </script>
 
     <style>
@@ -51,14 +50,14 @@
         }
 
         @media (min-width: 1024px) {
-            .app-container { width: 420px; height: 880px; max-height: 95vh; border-radius: 40px; border: 2px solid var(--glass-border); box-shadow: 0 50px 100px rgba(0,0,0,0.25); }
+            .app-container { width: 420px; height: 880px; max-height: 95vh; border-radius: 40px; box-shadow: 0 50px 100px rgba(0,0,0,0.25); }
         }
 
         .pill-glass-3d {
             background: var(--glass-bg); backdrop-filter: blur(10px);
             border: 1px solid var(--glass-border); border-radius: 22px;
             box-shadow: 0 6px 0 rgba(0, 0, 0, 0.15), inset 0 1px 1px var(--glass-highlight);
-            transition: all 0.1s ease; position: relative; overflow: hidden;
+            transition: all 0.1s ease;
         }
         .pill-glass-3d:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 3px 0 rgba(0,0,0,0.15); }
         .pill-glass-3d:disabled { opacity: 0.3; filter: grayscale(1); cursor: not-allowed; }
@@ -82,15 +81,8 @@
         .locked-section { opacity: 0.3; pointer-events: none; filter: blur(4px); transition: all 0.5s ease; }
         .unlocked-section { opacity: 1; pointer-events: auto; filter: none; }
 
-        #camera-overlay { position: absolute; inset: 0; background: black; z-index: 1000; display: none; flex-direction: column; }
+        #camera-overlay, #qr-scanner-overlay { position: absolute; inset: 0; background: black; z-index: 1000; display: none; flex-direction: column; }
         
-        .guide-frame {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 70vw; height: 105vw; max-width: 280px; max-height: 420px;
-            border: 3px solid #10b981; border-radius: 25px;
-            box-shadow: 0 0 0 1000px rgba(0,0,0,0.7); pointer-events: none;
-        }
-
         .toast-pro {
             position: fixed; top: 30px; left: 50%; transform: translateX(-50%) translateY(-150px);
             background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
@@ -102,14 +94,13 @@
         }
         .toast-pro.show { transform: translateX(-50%) translateY(0); }
 
-        /* Drop Shadow Portrait Gelap Mewah */
         .photo-portrait-shadow {
-            box-shadow: 0 40px 90px -15px rgba(0, 0, 0, 0.9), 0 30px 50px -25px rgba(0, 0, 0, 1);
-            border: 5px solid rgba(255,255,255,0.2);
+            box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.7), 0 20px 40px -20px rgba(0, 0, 0, 0.8);
+            border: 4px solid rgba(255,255,255,0.3);
         }
 
-        #modal-confirm {
-            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px);
+        #modal-confirm, #modal-qr-success {
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(10px);
             z-index: 9500; display: none; align-items: center; justify-content: center; padding: 20px;
         }
 
@@ -120,6 +111,9 @@
 
         .step-check { color: #10b981; font-weight: bold; font-size: 14px; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
+        
+        #qr-reader { width: 100% !important; border: none !important; }
+        #qr-reader video { border-radius: 20px; }
     </style>
 </head>
 <body>
@@ -147,9 +141,25 @@
                 <p id="modal-msg" class="text-sm text-slate-500 font-medium"></p>
             </div>
             <div class="flex gap-3">
-                <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400 uppercase text-xs">Batal</button>
+                <button onclick="window.closeModal()" class="flex-1 py-4 font-bold text-slate-400 uppercase text-xs">Batal</button>
                 <button id="confirm-submit-btn" class="flex-1 pill-glass-3d bg-slate-900 text-white font-black uppercase text-xs !shadow-[0_4px_0_#000]">Ya, Kirim</button>
             </div>
+        </div>
+    </div>
+
+    <!-- MODAL QR SUCCESS -->
+    <div id="modal-qr-success">
+        <div class="bg-white rounded-[40px] p-8 w-full max-w-sm shadow-2xl text-center space-y-6">
+            <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto">
+                <svg class="w-10 h-10 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-width="4"/></svg>
+            </div>
+            <h3 class="font-black text-xl text-slate-800 uppercase tracking-tighter leading-none">Berhasil!</h3>
+            <p class="text-xs text-slate-400 font-bold uppercase">QR Code Akses Login Anda</p>
+            <div class="bg-slate-50 p-4 rounded-3xl border-2 border-dashed border-emerald-200">
+                <img id="qr-display-img" src="" class="mx-auto w-48 h-48 rounded-xl" alt="QR Login">
+            </div>
+            <p class="text-[10px] text-slate-400 font-bold italic">Sreenshot QR ini untuk login cepat</p>
+            <button onclick="location.reload()" class="w-full pill-glass-3d bg-slate-900 text-white py-4 font-black uppercase text-sm !shadow-[0_5px_0_#000]">Selesai & Login</button>
         </div>
     </div>
 
@@ -164,18 +174,34 @@
         <!-- CAMERA OVERLAY -->
         <div id="camera-overlay">
             <video id="video-preview" class="w-full h-full object-cover" autoplay playsinline></video>
-            <div class="guide-frame"></div>
+            <div class="guide-frame border-2 border-emerald-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-96 rounded-3xl shadow-[0_0_0_1000px_rgba(0,0,0,0.7)] pointer-events-none"></div>
             <div class="absolute bottom-10 left-0 right-0 flex justify-around items-center px-10">
-                <button onclick="closeCamera()" class="p-4 bg-white/20 rounded-full text-white backdrop-blur-md"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2"/></svg></button>
-                <button onclick="takePicture()" class="w-20 h-20 bg-white rounded-full border-8 border-white/30 shadow-2xl active:scale-90 transition"></button>
+                <button onclick="window.closeCamera()" class="p-4 bg-white/20 rounded-full text-white backdrop-blur-md"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2"/></svg></button>
+                <button onclick="window.takePicture()" class="w-20 h-20 bg-white rounded-full border-8 border-white/30 shadow-2xl active:scale-90 transition"></button>
                 <div class="w-14"></div>
+            </div>
+        </div>
+
+        <!-- QR SCANNER OVERLAY (NEW) -->
+        <div id="qr-scanner-overlay">
+            <div class="flex-1 flex flex-col p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-white font-black uppercase tracking-widest text-sm">Scan QR Akses</h2>
+                    <button onclick="window.stopQRScanner()" class="p-2 bg-white/10 rounded-full text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2"/></svg></button>
+                </div>
+                <div class="bg-white/5 rounded-[40px] overflow-hidden p-4 border border-white/10 flex-1 flex items-center">
+                    <div id="qr-reader" class="w-full"></div>
+                </div>
+                <div class="py-10 text-center">
+                    <p class="text-white/40 text-[10px] uppercase font-bold tracking-widest">Arahkan kamera ke QR Code pegawai Anda</p>
+                </div>
             </div>
         </div>
 
         <!-- SCREEN: LOGIN -->
         <div id="login-screen" class="screen screen-active justify-center space-y-8 px-6">
             <div class="flex flex-col items-center">
-                <div class="w-24 h-24 bg-slate-900 rounded-[32px] flex items-center justify-center mb-4 shadow-2xl rotate-3 transition hover:rotate-0 duration-500">
+                <div class="w-24 h-24 bg-slate-900 rounded-[32px] flex items-center justify-center mb-4 shadow-2xl rotate-3">
                     <svg viewBox="0 0 24 24" class="w-14 h-14 text-white fill-current"><path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" /></svg>
                 </div>
                 <h1 class="text-3xl font-extrabold text-slate-800 tracking-tighter text-center uppercase leading-none">UPT PSDA<br><span class="text-emerald-600">BONDOYUDO</span></h1>
@@ -183,15 +209,18 @@
             <div class="space-y-4">
                 <input id="login-username" type="text" placeholder="Nama / Email / HP" class="input-glass">
                 <input id="login-password" type="password" placeholder="Password" class="input-glass">
-                
                 <div class="flex items-center gap-3 px-2 py-1">
                     <input type="checkbox" id="save-session" class="w-5 h-5 rounded border-white/30 bg-white/20 text-emerald-600 focus:ring-emerald-500 cursor-pointer">
-                    <label for="save-session" class="text-[10px] font-black text-slate-600 uppercase tracking-widest cursor-pointer">Ingat Saya di Perangkat Ini</label>
+                    <label for="save-session" class="text-[10px] font-black text-slate-600 uppercase tracking-widest cursor-pointer">Ingat Perangkat Ini</label>
                 </div>
-
-                <button id="login-btn-action" onclick="window.handleLogin()" class="w-full pill-glass-3d py-4 bg-slate-900 text-white font-black text-lg shadow-[0_6px_0_#000]">MASUK</button>
+                <button onclick="window.handleLogin()" class="w-full pill-glass-3d py-4 bg-slate-900 text-white font-black text-lg shadow-[0_6px_0_#000]">MASUK</button>
             </div>
-            <div class="flex justify-between items-end pb-4 pt-10 px-2">
+            <div class="flex items-center gap-4 py-2 opacity-50"><div class="flex-1 h-[1px] bg-slate-400"></div><span class="text-[10px] font-bold uppercase">Atau</span><div class="flex-1 h-[1px] bg-slate-400"></div></div>
+            <button onclick="window.startQRScanner()" class="w-full pill-glass-3d py-4 flex items-center justify-center gap-3 font-extrabold text-slate-700 bg-white/40">
+                <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h3m-3-3H8" stroke-width="2.5"/></svg>
+                SCAN QR LOGIN
+            </button>
+            <div class="flex justify-between items-end pb-4 pt-4 px-2">
                 <button onclick="window.navigateTo('forgot-screen')" class="text-left group focus:outline-none"><p class="text-slate-800 font-bold text-xs leading-none">Password</p><p class="text-[10px] text-slate-500 uppercase group-hover:underline">Lupa Sandi?</p></button>
                 <button onclick="window.navigateTo('register-screen')" class="text-right group focus:outline-none"><p class="text-emerald-700 font-bold text-xs leading-none">Register</p><p class="text-[10px] text-slate-500 uppercase underline">Daftar Akun</p></button>
             </div>
@@ -201,24 +230,22 @@
         <div id="register-screen" class="screen screen-hidden overflow-y-auto scrollbar-hide">
             <div class="flex items-center gap-4 mb-8" onclick="window.navigateTo('login-screen')">
                 <div class="p-2 bg-slate-900/10 rounded-xl"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="3"/></svg></div>
-                <h2 class="text-xl font-black text-slate-800 tracking-tight">Pendaftaran Pegawai</h2>
+                <h2 class="text-xl font-black text-slate-800 tracking-tight">Daftar Pegawai</h2>
             </div>
             <div class="space-y-6 pb-12">
                 <div class="flex flex-col items-center space-y-4">
-                    <div class="w-32 h-48 rounded-[25px] relative photo-portrait-shadow overflow-hidden bg-slate-300">
+                    <div class="w-32 h-48 rounded-[25px] relative photo-portrait-shadow overflow-hidden bg-slate-200">
                         <div id="preview-profile" class="absolute inset-0 hidden"><img class="w-full h-full object-cover"></div>
-                        <div id="placeholder-reg-photo" class="absolute inset-0 flex items-center justify-center">
-                            <svg id="placeholder-icon" class="w-12 h-12 text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                        </div>
+                        <div class="absolute inset-0 flex items-center justify-center" id="placeholder-reg-photo"><svg class="w-12 h-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>
                     </div>
                     <div class="flex gap-4">
-                        <button onclick="window.openCamera('profile')" class="pill-glass-3d p-3 bg-white/50 text-slate-700 flex items-center gap-2 text-xs font-bold"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Ambil Foto</button>
-                        <button onclick="document.getElementById('file-upload-profile').click()" class="pill-glass-3d p-3 bg-white/50 text-slate-700 flex items-center gap-2 text-xs font-bold"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>Unggah</button>
+                        <button onclick="window.openCamera('profile')" class="pill-glass-3d p-3 bg-white/50 text-slate-700 flex items-center gap-2 text-xs font-bold"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/></svg>Ambil Foto</button>
+                        <button onclick="document.getElementById('file-upload-profile').click()" class="pill-glass-3d p-3 bg-white/50 text-slate-700 flex items-center gap-2 text-xs font-bold"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1"/></svg>Unggah</button>
                         <input type="file" id="file-upload-profile" class="hidden" accept="image/*" onchange="window.handleFileUpload(event)">
                     </div>
                 </div>
                 <div class="space-y-4">
-                    <input id="reg-id" type="text" placeholder="ID Pegawai (Contoh: P001)" class="input-glass">
+                    <input id="reg-id" type="text" placeholder="ID Pegawai (P001...)" class="input-glass">
                     <input id="reg-nama" type="text" placeholder="Nama Lengkap" class="input-glass">
                     <select id="reg-jabatan" class="input-glass" onchange="window.toggleManual(this, 'manual-jabatan')">
                         <option value="" disabled selected>Pilih Jabatan</option>
@@ -231,7 +258,7 @@
                     </select>
                     <input id="manual-wilayah" type="text" placeholder="Ketik Wilayah" class="input-glass hidden border-emerald-400">
                     <input id="reg-email" type="email" placeholder="Email Aktif" class="input-glass">
-                    <input id="reg-hp" type="tel" placeholder="Nomor HP (Contoh: 08...)" class="input-glass">
+                    <input id="reg-hp" type="tel" placeholder="Nomor HP (08...)" class="input-glass">
                     <input id="reg-lokasi" type="text" placeholder="Lokasi Penempatan" class="input-glass">
                     <input id="reg-password" type="password" placeholder="Password Baru" class="input-glass">
                 </div>
@@ -247,10 +274,8 @@
             </div>
             <div class="flex-1 flex flex-col justify-center space-y-6">
                 <div class="text-center space-y-2">
-                    <div class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
-                        <svg class="w-10 h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-width="2"/></svg>
-                    </div>
-                    <p class="text-sm text-slate-600">Masukkan kontak terdaftar (Email/HP) untuk pemulihan.</p>
+                    <div class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner"><svg class="w-10 h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-width="2"/></svg></div>
+                    <p class="text-sm text-slate-600">Instruksi pemulihan akan dikirimkan.</p>
                 </div>
                 <input id="forgot-input" type="text" placeholder="Email / Nomor HP" class="input-glass">
                 <button onclick="window.handleForgotPassword()" class="w-full pill-glass-3d py-5 bg-amber-600 text-white font-black text-lg shadow-[0_6px_0_#92400e]">KIRIM PERMINTAAN</button>
@@ -269,14 +294,14 @@
                     <p id="user-job" class="text-[10px] font-bold text-emerald-600 tracking-widest uppercase">...</p>
                     <div id="gps-status-container" class="mt-3 px-5 py-2 bg-white/50 rounded-full border border-white inline-flex items-center gap-2 shadow-sm">
                         <div id="gps-dot" class="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></div>
-                        <span id="gps-text" class="text-[10px] font-black uppercase tracking-tight">Kunci Koordinat</span>
+                        <span id="gps-text" class="text-[10px] font-black uppercase tracking-tight">Kunci Lokasi GPS</span>
                         <span id="gps-v" class="hidden text-emerald-600 font-bold text-xs ml-1">V</span>
                     </div>
                 </div>
             </div>
 
             <div class="px-6 mb-4">
-                <button id="lock-gps-btn" onclick="window.getRealLocation()" class="w-full pill-glass-3d py-5 bg-emerald-600 text-white font-black text-sm uppercase tracking-widest !shadow-[0_6px_0_#064e3b]">KUNCI LOKASI GPS (STEP 1)</button>
+                <button id="lock-gps-btn" onclick="window.getRealLocation()" class="w-full pill-glass-3d py-5 bg-emerald-600 text-white font-black text-sm uppercase tracking-widest !shadow-[0_6px_0_#064e3b]">AMBIL KOORDINAT (STEP 1)</button>
             </div>
 
             <div id="attendance-form" class="locked-section space-y-8 bg-white/20 border-y border-white/40 py-10 px-6 shadow-2xl mb-8 w-full rounded-[55px]">
@@ -301,11 +326,11 @@
 
                 <div class="space-y-2">
                     <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Keterangan Aktivitas <span id="notes-v" class="step-check hidden ml-2">V Terisi</span></label>
-                    <textarea id="attendance-notes" oninput="window.validateForm()" class="input-glass !h-36 resize-none focus:outline-none" placeholder="Tulis catatan atau bukti kendala..."></textarea>
+                    <textarea id="attendance-notes" oninput="window.validateForm()" class="input-glass !h-36 resize-none focus:outline-none" placeholder="Tuliskan aktivitas detail Anda hari ini..."></textarea>
                 </div>
 
                 <div class="space-y-4">
-                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Dokumentasi <span id="media-v" class="step-check hidden ml-2">V Lengkap</span></label>
+                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Lampiran Foto <span id="media-v" class="step-check hidden ml-2">V Lengkap</span></label>
                     <div class="grid grid-cols-2 gap-5">
                         <div class="relative">
                             <button onclick="window.openCamera('selfie')" class="w-full pill-glass-3d aspect-square flex flex-col items-center justify-center gap-2 overflow-hidden">
@@ -313,7 +338,6 @@
                                 <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-width="1.5"/></svg>
                                 <span class="text-[9px] font-black uppercase text-slate-500">Selfie</span>
                             </button>
-                            <button id="retry-selfie" onclick="window.openCamera('selfie')" class="absolute -top-2 -right-2 bg-white text-red-500 p-2 rounded-full hidden shadow-lg border border-red-100"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-width="3"/></svg></button>
                         </div>
                         <div class="relative">
                             <button onclick="window.openCamera('kerja')" class="w-full pill-glass-3d aspect-square flex flex-col items-center justify-center gap-2 overflow-hidden">
@@ -321,7 +345,6 @@
                                 <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-width="1.5"/></svg>
                                 <span class="text-[9px] font-black uppercase text-slate-500">Lokasi</span>
                             </button>
-                            <button id="retry-kerja" onclick="window.openCamera('kerja')" class="absolute -top-2 -right-2 bg-white text-red-500 p-2 rounded-full hidden shadow-lg border border-red-100"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-width="3"/></svg></button>
                         </div>
                     </div>
                 </div>
@@ -337,17 +360,11 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbzE8Ko__c6BgxbYIfz0Uvres49hsZ3yo_3JJ0eu6BbQVckKCqeL4Dhyu8bLSZsoZJ3qlw/exec";
         
         // Safety Fallback for Variables
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'upt-psda-pro';
-        let firebaseConfig = null;
-        try {
-            firebaseConfig = (typeof __firebase_config !== 'undefined' && __firebase_config) ? JSON.parse(__firebase_config) : null;
-        } catch(e) { console.error("Config missing"); }
-
-        // State
         let currentUser = null, currentScreen = 'login-screen', selectedStatus = "", coordinates = "", selfieRaw = null, kerjaRaw = null, activeCameraMode = null, profilePhotoRaw = null;
         let serverTime = null, dailyStatus = { hasHadir: false, hasPulang: false, hasSpecial: false, hasMargin: false };
+        let html5QrCode = null;
 
-        // Globalized Functions for onclick
+        // Globalized Functions
         window.showToast = (msg, type = "info", title = "Pemberitahuan") => {
             const toast = document.getElementById('toast-element');
             const box = document.getElementById('toast-icon-box');
@@ -361,7 +378,8 @@
 
         window.showLoading = (s, text = "Sinkronisasi Server...") => { 
             const loader = document.getElementById('global-loader');
-            document.getElementById('loader-text').innerText = text;
+            const lText = document.getElementById('loader-text');
+            if (lText) lText.innerText = text;
             loader.style.display = s ? 'flex' : 'none'; 
         };
 
@@ -375,7 +393,7 @@
 
         window.closeModal = () => { document.getElementById('modal-confirm').style.display = 'none'; };
 
-        // --- LOCAL STORAGE SESSION LOGIC ---
+        // --- SESSION LOGIC ---
         const loadLocalSession = () => {
             const saved = localStorage.getItem('upt_psda_login');
             if (saved) {
@@ -396,17 +414,40 @@
             }
         };
 
-        // Firebase Auth (Init only if config is valid)
-        if (firebaseConfig && firebaseConfig.apiKey) {
-            try {
-                const { initializeApp, getAuth, signInAnonymously, onAuthStateChanged, getFirestore } = window.firebaseInit;
-                const app = initializeApp(firebaseConfig);
-                const auth = getAuth(app);
-                onAuthStateChanged(auth, (u) => { if(!u) signInAnonymously(auth); });
-            } catch(e) { console.warn("Firebase restricted"); }
-        }
+        // --- QR SCANNER LOGIC (NEW) ---
+        window.startQRScanner = () => {
+            document.getElementById('qr-scanner-overlay').style.display = 'flex';
+            html5QrCode = new Html5Qrcode("qr-reader");
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+            
+            html5QrCode.start({ facingMode: "environment" }, config, async (decodedText) => {
+                window.stopQRScanner();
+                window.showLoading(true, "Mencocokkan Token QR...");
+                try {
+                    const response = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "login", type: "qr", token: decodedText }) });
+                    const res = await response.json();
+                    if (res.status === "success") {
+                        handleLoginSuccess(res.data);
+                    } else window.showToast(res.message, "error", "Login Gagal");
+                } catch (e) { window.showToast("Gagal scan. Server offline.", "error"); }
+                window.showLoading(false);
+            }, (err) => {});
+        };
 
-        // --- Core Business Logic ---
+        window.stopQRScanner = () => {
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    document.getElementById('qr-scanner-overlay').style.display = 'none';
+                    html5QrCode = null;
+                }).catch(() => {
+                    document.getElementById('qr-scanner-overlay').style.display = 'none';
+                });
+            } else {
+                document.getElementById('qr-scanner-overlay').style.display = 'none';
+            }
+        };
+
+        // --- AUTH LOGIC ---
         window.handleLogin = async () => {
             const username = document.getElementById('login-username').value;
             const password = document.getElementById('login-password').value;
@@ -419,22 +460,26 @@
                 const res = await response.json();
                 
                 if (res.status === "success") {
-                    saveLocalSession(username, password); // Simpan sesi di lokal
-                    currentUser = res.data;
-                    document.getElementById('user-name').innerText = currentUser.Nama;
-                    document.getElementById('user-job').innerText = currentUser.Jabatan;
-                    document.getElementById('user-photo').src = currentUser.FotoUrl;
-                    
-                    const statusResp = await fetch(API_URL + "?action=getTodayStatus&nama=" + encodeURIComponent(currentUser.Nama));
-                    dailyStatus = await statusResp.json();
-                    
-                    applyBusinessRules();
-                    window.navigateTo('presensi-screen');
-                    window.showToast("Login Berhasil.", "success", "Selamat Datang");
+                    saveLocalSession(username, password);
+                    handleLoginSuccess(res.data);
                 } else window.showToast(res.message, "error");
             } catch (e) { window.showToast("Server tidak merespon.", "error"); }
             window.showLoading(false);
         };
+
+        async function handleLoginSuccess(userData) {
+            currentUser = userData;
+            document.getElementById('user-name').innerText = currentUser.Nama;
+            document.getElementById('user-job').innerText = currentUser.Jabatan;
+            document.getElementById('user-photo').src = currentUser.FotoUrl;
+            
+            const statusResp = await fetch(API_URL + "?action=getTodayStatus&nama=" + encodeURIComponent(currentUser.Nama));
+            dailyStatus = await statusResp.json();
+            
+            applyBusinessRules();
+            window.navigateTo('presensi-screen');
+            window.showToast("Login Berhasil.", "success", "Selamat Datang");
+        }
 
         function applyBusinessRules() {
             if (dailyStatus.hasSpecial) {
@@ -475,7 +520,7 @@
 
         window.setStatus = (s, el) => {
             if (s === 'Pulang' && !dailyStatus.hasHadir && !dailyStatus.hasMargin && selectedStatus !== 'Margin Error') {
-                return window.showToast("Hadir/Margin Error dulu baru Pulang.", "error", "Logika Urutan");
+                return window.showToast("Wajib Hadir/Margin Error dulu baru Pulang.", "error", "Logika Urutan");
             }
             selectedStatus = s;
             document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active-hadir', 'active-pulang', 'active-special', 'active-error'));
@@ -516,39 +561,35 @@
             ctx.fillStyle = "rgba(0, 0, 0, 0.65)";
             ctx.fillRect(0, 720, 600, 180);
             ctx.fillStyle = "white";
-            ctx.font = "bold 28px Poppins"; ctx.fillText((currentUser ? currentUser.Nama : "REGISTRASI").toUpperCase(), 30, 770);
-            ctx.font = "18px Poppins"; ctx.fillText((currentUser ? currentUser.Jabatan : "USER") + " | " + selectedStatus.toUpperCase(), 30, 805);
-            ctx.font = "14px Poppins"; ctx.fillText("WIB: " + (serverTime || "SYNC...") + " | KOOR: " + coordinates, 30, 840);
-            ctx.fillStyle = "#10b981"; ctx.font = "bold 12px Poppins"; ctx.fillText("✓ UPT PSDA VERIFIED IMAGE", 30, 875);
+            ctx.font = "bold 28px Poppins"; ctx.fillText((currentUser ? currentUser.Nama : "PROFIL").toUpperCase(), 30, 770);
+            ctx.font = "18px Poppins"; ctx.fillText((currentUser ? currentUser.Jabatan : "CALON") + " | " + selectedStatus.toUpperCase(), 30, 805);
+            ctx.font = "14px Poppins"; ctx.fillText("JAM: " + (serverTime || "--:--") + " | LOKASI: " + coordinates, 30, 840);
+            ctx.fillStyle = "#10b981"; ctx.font = "bold 12px Poppins"; ctx.fillText("✓ UPT PSDA BONDOYUDO BANYUWANGI", 30, 875);
 
             const data = c.toDataURL('image/jpeg', 0.8);
             if (activeCameraMode === 'profile') {
-                profilePhotoRaw = data;
                 document.getElementById('preview-profile').classList.remove('hidden');
                 document.getElementById('preview-profile').querySelector('img').src = data;
                 document.getElementById('placeholder-reg-photo').classList.add('hidden');
+                profilePhotoRaw = data;
             } else if (activeCameraMode === 'selfie') {
                 selfieRaw = data; document.getElementById('preview-selfie').classList.remove('hidden');
                 document.getElementById('preview-selfie').querySelector('img').src = data;
-                document.getElementById('retry-selfie').classList.remove('hidden');
                 document.getElementById('photo-v').classList.remove('hidden');
             } else {
                 kerjaRaw = data; document.getElementById('preview-kerja').classList.remove('hidden');
                 document.getElementById('preview-kerja').querySelector('img').src = data;
-                document.getElementById('retry-kerja').classList.remove('hidden');
             }
             window.closeCamera();
             window.validateForm();
         };
 
         window.validateForm = () => {
-            const notes = document.getElementById('attendance-notes').value;
-            const hasNotes = notes.length >= 5;
-            const hasMedia = (selfieRaw && kerjaRaw);
+            const hasNotes = document.getElementById('attendance-notes').value.length >= 5;
             document.getElementById('notes-v').classList.toggle('hidden', !hasNotes);
-            document.getElementById('media-v').classList.toggle('hidden', !hasMedia);
+            document.getElementById('media-v').classList.toggle('hidden', !(selfieRaw && kerjaRaw));
             const btn = document.getElementById('final-submit');
-            if (selectedStatus && hasNotes && hasMedia) {
+            if (selectedStatus && hasNotes && selfieRaw && kerjaRaw) {
                 btn.classList.replace('opacity-50', 'opacity-100'); btn.classList.replace('pointer-events-none', 'pointer-events-auto');
             } else {
                 btn.classList.replace('opacity-100', 'opacity-50'); btn.classList.add('pointer-events-none');
@@ -559,11 +600,11 @@
             if (["Hadir", "Pulang"].includes(selectedStatus)) { window.submitAttendance(); return; }
             let msg = `Kirim status "${selectedStatus.toUpperCase()}"? `;
             switch(selectedStatus) {
-                case 'Izin': msg += "Sertakan foto surat izin."; break;
-                case 'Sakit': msg += "Wajib surat dokter."; break;
-                case 'Dinas': msg += "Lampirkan surat dinas."; break;
-                case 'Cuti': msg += "Sertakan surat cuti."; break;
-                case 'Margin Error': msg += "Foto bukti hambatan & keterangan lengkap."; break;
+                case 'Izin': msg += "Wajib lampirkan foto surat izin."; break;
+                case 'Sakit': msg += "Wajib lampirkan surat keterangan dokter."; break;
+                case 'Dinas': msg += "Wajib lampirkan surat tugas/dinas."; break;
+                case 'Cuti': msg += "Wajib lampirkan surat izin cuti."; break;
+                case 'Margin Error': msg += "Lampirkan bukti hambatan & penjelasan detail."; break;
             }
             document.getElementById('modal-msg').innerText = msg;
             document.getElementById('confirm-submit-btn').onclick = () => { window.closeModal(); window.submitAttendance(); };
@@ -571,22 +612,20 @@
         };
 
         window.submitAttendance = async () => {
-            window.showLoading(true, "Mengirim Data...");
-            const payload = {
-                action: "submitAttendance", nama: currentUser.Nama, jabatan: currentUser.Jabatan,
-                status: selectedStatus, koordinat: coordinates, fotoSelfie: selfieRaw,
-                fotoKerja: kerjaRaw, keterangan: document.getElementById('attendance-notes').value + (document.getElementById('duration-box').classList.contains('hidden') ? "" : " ["+document.getElementById('rentang-waktu').value+" Hari]")
-            };
+            window.showLoading(true, "Mengirim Data Presensi...");
             try {
-                const response = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
+                const response = await fetch(API_URL, { method: "POST", body: JSON.stringify({
+                    action: "submitAttendance", nama: currentUser.Nama, jabatan: currentUser.Jabatan,
+                    status: selectedStatus, koordinat: coordinates, fotoSelfie: selfieRaw,
+                    fotoKerja: kerjaRaw, keterangan: document.getElementById('attendance-notes').value + (document.getElementById('duration-box').classList.contains('hidden') ? "" : " ["+document.getElementById('rentang-waktu').value+" Hari]")
+                })});
                 const res = await response.json();
-                if (res.status === "success") { window.showToast(res.message, "success", "Berhasil"); setTimeout(() => location.reload(), 4500); }
-                else window.showToast(res.message, "error", "Gagal");
-            } catch (e) { window.showToast("Error koneksi.", "error"); }
+                if (res.status === "success") { window.showToast(res.message, "success", "Sinkronisasi Berhasil"); setTimeout(() => location.reload(), 4000); }
+                else window.showToast(res.message, "error");
+            } catch (e) { window.showToast("Error koneksi server.", "error"); }
             window.showLoading(false);
         };
 
-        window.toggleManual = (sel, id) => { document.getElementById(id).classList.toggle('hidden', sel.value !== 'manual'); };
         window.handleFileUpload = (e) => {
             const file = e.target.files[0];
             if (file) {
@@ -611,31 +650,33 @@
                 LokasiPenempatan: document.getElementById('reg-lokasi').value, Password: document.getElementById('reg-password').value,
                 FotoUrl: profilePhotoRaw
             };
-            if (!payload.Nama || !profilePhotoRaw) return window.showToast("Foto & Nama wajib diisi.", "error");
-            window.showLoading(true, "Mendaftar...");
+            if (!payload.Nama || !profilePhotoRaw) return window.showToast("Data & Foto profil wajib diisi.", "error");
+            window.showLoading(true, "Registrasi Pegawai...");
             try {
                 const res = await (await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) })).json();
-                if (res.status === "success") { window.showToast("Pendaftaran Berhasil!", "success"); setTimeout(() => window.navigateTo('login-screen'), 3000); }
-                else window.showToast(res.message, "error");
+                if (res.status === "success") { 
+                    document.getElementById('qr-display-img').src = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + (res.qrToken || payload.ID);
+                    document.getElementById('modal-qr-success').style.display = 'flex';
+                } else window.showToast(res.message, "error");
             } catch (e) { window.showToast("Error koneksi server.", "error"); }
             window.showLoading(false);
         };
 
         window.handleForgotPassword = async () => {
             const inp = document.getElementById('forgot-input').value;
-            if(!inp) return window.showToast("Masukkan data kontak.", "error");
+            if(!inp) return window.showToast("Masukkan kontak.", "error");
             window.showLoading(true, "Mengecek...");
             try {
                 const res = await (await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "forgotPassword", input: inp }) })).json();
-                window.showToast(res.message, "success", "Berhasil");
+                window.showToast(res.message, "success", "Reset Berhasil");
                 setTimeout(() => window.navigateTo('login-screen'), 3000);
-            } catch (e) { window.showToast("Permintaan gagal.", "error"); }
+            } catch (e) { window.showToast("Gagal.", "error"); }
             window.showLoading(false);
         };
 
-        // Load saved session on start
-        loadLocalSession();
+        window.toggleManual = (sel, id) => { document.getElementById(id).classList.toggle('hidden', sel.value !== 'manual'); };
 
+        loadLocalSession();
     </script>
 </body>
 </html>
