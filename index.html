@@ -101,7 +101,6 @@
         }
         .toast-pro.show { transform: translateX(-50%) translateY(0); }
 
-        /* --- UPDATED SHADOW STYLES --- */
         .photo-portrait-shadow {
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
             border: 2px solid rgba(255,255,255,0.2);
@@ -114,6 +113,7 @@
         .active-hadir { background: #10b981 !important; color: white !important; box-shadow: 0 6px 0 #065f46 !important; }
         .active-pulang { background: #f59e0b !important; color: white !important; box-shadow: 0 6px 0 #92400e !important; }
         .active-error { background: #ef4444 !important; color: white !important; box-shadow: 0 6px 0 #991b1b !important; }
+        .active-special { background: #3b82f6 !important; color: white !important; box-shadow: 0 6px 0 #1e40af !important; }
 
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         #qr-reader { width: 100% !important; border: none !important; }
@@ -175,11 +175,15 @@
                     <h2 class="text-white font-black uppercase tracking-widest text-xs">Scan QR Akses</h2>
                     <button onclick="window.stopQRScanner()" class="p-3 bg-white/10 rounded-full text-white"><i class="fas fa-times"></i></button>
                 </div>
-                <div class="bg-white/5 rounded-[40px] overflow-hidden p-4 border border-white/10 flex-1 flex items-center">
+                <div class="bg-white/5 rounded-[40px] overflow-hidden p-4 border border-white/10 flex-1 flex items-center relative">
                     <div id="qr-reader" class="w-full"></div>
                 </div>
-                <div class="py-10 text-center">
+                <div class="py-6 flex flex-col items-center gap-4">
                     <p class="text-white/40 text-[10px] uppercase font-bold tracking-[0.2em]">Arahkan ke QR Code Pegawai</p>
+                    <button onclick="document.getElementById('qr-file-input').click()" class="pill-glass-3d px-6 py-3 bg-white/20 text-white font-black text-[10px] uppercase tracking-widest">
+                        <i class="fas fa-image mr-2"></i> PILIH DARI GALERI
+                    </button>
+                    <input type="file" id="qr-file-input" accept="image/*" class="hidden" onchange="window.scanQRFromFile(event)">
                 </div>
             </div>
         </div>
@@ -187,7 +191,6 @@
         <!-- SCREEN: LOGIN -->
         <div id="login-screen" class="screen screen-active justify-center space-y-10">
             <div class="flex flex-col items-center">
-                <!-- No bg-white, just shadow -->
                 <div class="w-24 h-24 flex items-center justify-center mb-6 icon-drop-shadow">
                     <img src="https://lh3.googleusercontent.com/d/1ognTdYTF6KwNc5aCOFl8T6UyFMcjvsnQ" class="w-full h-full object-contain" alt="Logo">
                 </div>
@@ -230,7 +233,6 @@
             </div>
             <div class="space-y-6 pb-12 px-2">
                 <div class="flex flex-col items-center space-y-4">
-                    <!-- Photo Registration Container -->
                     <div class="w-32 h-48 rounded-[30px] relative photo-portrait-shadow overflow-hidden bg-slate-800/20 backdrop-blur-md">
                         <div id="preview-profile" class="absolute inset-0 hidden"><img class="w-full h-full object-cover"></div>
                         <div id="placeholder-reg-photo" class="absolute inset-0 flex items-center justify-center">
@@ -279,7 +281,7 @@
             </div>
             <div class="flex-1 flex flex-col justify-center space-y-6">
                 <div class="text-center space-y-2">
-                    <div class="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+                    <div class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
                         <svg class="w-10 h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-width="2"/></svg>
                     </div>
                     <p class="text-sm text-slate-600">Detail login akan dikirim ke Telegram/Email terdaftar.</p>
@@ -292,10 +294,9 @@
         <!-- SCREEN: PRESENSI -->
         <div id="presensi-screen" class="screen screen-hidden overflow-y-auto scrollbar-hide !px-2">
             <div class="flex flex-col items-center pt-8 mb-6">
-                <!-- Profile Image with Dark Shadow and no white bg -->
                 <div class="rounded-[35px] relative photo-portrait-shadow overflow-hidden bg-slate-800/30 backdrop-blur-md" style="width: 130px; height: 195px;">
                     <img id="user-photo" src="" class="w-full h-full object-cover">
-                    <div id="photo-v" class="absolute bottom-3 right-3 w-8 h-8 bg-emerald-500 rounded-full border-2 border-white hidden items-center justify-center text-white font-black shadow-lg"><i class="fas fa-check"></i></div>
+                    <div id="photo-v" class="absolute bottom-3 right-3 w-8 h-8 bg-emerald-50 rounded-full border-2 border-white hidden items-center justify-center text-white font-black shadow-lg"><i class="fas fa-check"></i></div>
                 </div>
                 <div class="mt-6 text-center px-4">
                     <h2 id="user-name" class="text-2xl font-black text-slate-800 tracking-tighter leading-none mb-1 uppercase">...</h2>
@@ -381,6 +382,17 @@
 
         const { initializeApp, getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken, getFirestore, doc, setDoc, getDoc } = window.firebaseInit;
 
+        // --- SESSION MANAGEMENT (Perangkat) ---
+        function loadSession() {
+            const savedUser = localStorage.getItem('presensi_remember_user');
+            const savedPass = localStorage.getItem('presensi_remember_pass');
+            if(savedUser && savedPass) {
+                document.getElementById('login-username').value = savedUser;
+                document.getElementById('login-password').value = savedPass;
+                document.getElementById('save-session').checked = true;
+            }
+        }
+
         // Init Firebase
         if (firebaseConfig.apiKey) {
             const app = initializeApp(firebaseConfig);
@@ -388,18 +400,8 @@
             db = getFirestore(app);
             onAuthStateChanged(auth, async (u) => {
                 user = u;
-                if (user) {
-                    const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'session', 'login_data');
-                    try {
-                        const snap = await getDoc(docRef);
-                        if (snap.exists()) {
-                            const data = snap.data();
-                            document.getElementById('login-username').value = data.user || "";
-                            document.getElementById('login-password').value = data.pass || "";
-                            document.getElementById('save-session').checked = true;
-                        }
-                    } catch (e) {}
-                } else {
+                loadSession();
+                if (!user) {
                     if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
                     else await signInAnonymously(auth);
                 }
@@ -435,22 +437,39 @@
 
         window.closeModal = () => { document.getElementById('modal-confirm').style.display = 'none'; };
 
-        // --- QR SCANNER ---
+        // --- QR SCANNER (Camera + File) ---
         window.startQRScanner = () => {
             document.getElementById('qr-scanner-overlay').style.display = 'flex';
             html5QrCode = new Html5Qrcode("qr-reader");
             const config = { fps: 10, qrbox: { width: 250, height: 250 } };
             html5QrCode.start({ facingMode: "environment" }, config, async (token) => {
-                window.stopQRScanner();
-                window.showLoading(true, "Memvalidasi Token...");
-                try {
-                    const res = await (await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "login", type: "qr", token }) })).json();
-                    if (res.status === "success") handleLoginSuccess(res.data);
-                    else window.showToast(res.message, "error");
-                } catch (e) { window.showToast("Gagal terhubung.", "error"); }
-                window.showLoading(false);
+                handleQRScanResult(token);
             }, (err) => {});
         };
+
+        window.scanQRFromFile = (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            const tempScanner = new Html5Qrcode("qr-reader");
+            tempScanner.scanFile(file, true)
+                .then(token => {
+                    handleQRScanResult(token);
+                })
+                .catch(err => {
+                    window.showToast("QR tidak ditemukan dalam gambar.", "error");
+                });
+        };
+
+        async function handleQRScanResult(token) {
+            window.stopQRScanner();
+            window.showLoading(true, "Memvalidasi Token...");
+            try {
+                const res = await (await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "login", type: "qr", token }) })).json();
+                if (res.status === "success") handleLoginSuccess(res.data);
+                else window.showToast(res.message, "error");
+            } catch (e) { window.showToast("Gagal terhubung.", "error"); }
+            window.showLoading(false);
+        }
 
         window.stopQRScanner = () => {
             if (html5QrCode) html5QrCode.stop().then(() => { document.getElementById('qr-scanner-overlay').style.display = 'none'; html5QrCode = null; });
@@ -463,14 +482,19 @@
             const passInp = document.getElementById('login-password').value;
             const saveCheck = document.getElementById('save-session').checked;
             if (!userInp || !passInp) return window.showToast("Isi form lengkap.", "error");
+            
+            if(saveCheck) {
+                localStorage.setItem('presensi_remember_user', userInp);
+                localStorage.setItem('presensi_remember_pass', passInp);
+            } else {
+                localStorage.removeItem('presensi_remember_user');
+                localStorage.removeItem('presensi_remember_pass');
+            }
+
             window.showLoading(true, "Verifikasi Akun...");
             try {
                 const res = await (await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "login", username: userInp, password: passInp }) })).json();
                 if (res.status === "success") {
-                    if (db && user) {
-                        const ref = doc(db, 'artifacts', appId, 'users', user.uid, 'session', 'login_data');
-                        await setDoc(ref, saveCheck ? { user: userInp, pass: passInp } : {});
-                    }
                     handleLoginSuccess(res.data);
                 } else window.showToast(res.message, "error");
             } catch (e) { window.showToast("Server tidak merespon.", "error"); }
@@ -494,7 +518,7 @@
             window.showLoading(false);
         }
 
-        // --- BUSINESS LOGIC (PENTING: Urutan Sistem) ---
+        // --- BUSINESS LOGIC (URUTAN SISTEM) ---
         function applyBusinessRules() {
             const btnHadir = document.getElementById('btn-hadir');
             const btnPulang = document.getElementById('btn-pulang');
@@ -516,7 +540,8 @@
                 return;
             }
 
-            if (!dailyStatus.hasHadir && !dailyStatus.hasMargin) {
+            // Aturan Pulang: Wajib Hadir ATAU sudah lapor Margin Error tapi TETAP harus Hadir
+            if (!dailyStatus.hasHadir) {
                 btnPulang.disabled = true;
             }
 
@@ -528,9 +553,9 @@
 
             if (dailyStatus.hasMargin && !dailyStatus.hasHadir) {
                 btnMargin.disabled = true;
-                btnPulang.disabled = true;
+                btnPulang.disabled = true; // Tetap tidak boleh pulang sebelum hadir
                 btnHadir.disabled = false;
-                window.showToast("Laporan hambatan diterima. Silakan absen HADIR saat tiba.", "info");
+                window.showToast("Hambatan diterima. Silakan absen HADIR saat tiba di lokasi.", "info");
             }
         }
 
@@ -545,9 +570,17 @@
                 document.getElementById('gps-v').classList.remove('hidden');
                 document.getElementById('lock-gps-btn').style.display = "none";
                 document.getElementById('attendance-form').className = "unlocked-section space-y-8 bg-white/20 border-y border-white/40 py-10 px-4 shadow-2xl mb-8 w-full rounded-[55px]";
+                
                 try {
                     const t = await (await fetch(API_URL + "?action=getServerTime")).json();
                     serverTime = t.formattedTime;
+                    // Logika Jam Server (07:30 = 450 Menit)
+                    const [h, m] = serverTime.split(':').map(Number);
+                    const serverMinutes = h * 60 + m;
+                    if (serverMinutes > 450) {
+                        const diff = serverMinutes - 450;
+                        window.showToast(`Peringatan: Terlambat ${diff} menit.`, "error", "Jam Server");
+                    }
                 } catch(e) { serverTime = new Date().toLocaleTimeString('id-ID', {hour12: false}); }
                 window.showLoading(false);
             }, () => { window.showLoading(false); window.showToast("Gagal lokasi. Aktifkan GPS.", "error"); }, { enableHighAccuracy: true, timeout: 35000 });
@@ -593,7 +626,6 @@
             else { dW = sW; dH = sW / targetRatio; dX = 0; dY = (sH - dH) / 2; }
             ctx.drawImage(v, dX, dY, dW, dH, 0, 0, targetW, targetH);
             
-            // --- DESIGN WATERMARK PRO ---
             const grad = ctx.createLinearGradient(0, targetH * 0.65, 0, targetH);
             grad.addColorStop(0, "rgba(0, 0, 0, 0)");
             grad.addColorStop(1, "rgba(0, 0, 0, 0.9)");
@@ -666,7 +698,7 @@
             let msg = `Kirim data ${selectedStatus.toUpperCase()} ke server?`;
             
             if (selectedStatus === 'Margin Error') {
-                msg = "PERINGATAN: Laporkan kendala dengan foto & keterangan akurat. \n\nINGAT: Setelah ini Anda TETAP WAJIB melakukan absensi HADIR saat tiba di lokasi.";
+                msg = "PENTING: Laporkan kendala dengan bukti foto. Setelah ini Anda TETAP WAJIB absen HADIR saat tiba di lokasi.";
             }
 
             document.getElementById('modal-msg').innerText = msg;
@@ -676,7 +708,24 @@
 
         window.submitAttendance = async () => {
             window.showLoading(true, "Mengirim Presensi...");
-            const body = { action: "submitAttendance", nama: currentUser.Nama, jabatan: currentUser.Jabatan, status: selectedStatus, koordinat: coordinates, fotoSelfie: selfieRaw, fotoKerja: kerjaRaw, keterangan: document.getElementById('attendance-notes').value };
+            
+            // Logika Skor Terlambat (Jam 07:30)
+            const [h, m] = serverTime.split(':').map(Number);
+            let calculatedScore = (selectedStatus === 'Hadir' && (h * 60 + m > 450)) ? 40 : 50;
+            if (selectedStatus === 'Margin Error') calculatedScore = 10;
+
+            const body = { 
+                action: "submitAttendance", 
+                nama: currentUser.Nama, 
+                jabatan: currentUser.Jabatan, 
+                status: selectedStatus, 
+                koordinat: coordinates, 
+                fotoSelfie: selfieRaw, 
+                fotoKerja: kerjaRaw, 
+                keterangan: document.getElementById('attendance-notes').value,
+                skor: calculatedScore 
+            };
+
             try {
                 const res = await (await fetch(API_URL, { method: "POST", body: JSON.stringify(body) })).json();
                 if (res.status === "success") { 
@@ -689,6 +738,7 @@
         };
 
         window.toggleManual = (sel, id) => document.getElementById(id).classList.toggle('hidden', sel.value !== 'manual');
+        
         window.handleFileUpload = (e) => {
             const reader = new FileReader();
             reader.onload = ev => {
