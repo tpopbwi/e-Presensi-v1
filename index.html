@@ -419,7 +419,8 @@
 
         window.showLoading = (s, text = "Sinkronisasi Server...") => { 
             const loader = document.getElementById('global-loader');
-            document.getElementById('loader-text').innerText = text;
+            const lText = document.getElementById('loader-text');
+            if (lText) lText.innerText = text;
             loader.style.display = s ? 'flex' : 'none'; 
         };
 
@@ -545,15 +546,58 @@
 
         window.takePicture = () => {
             const v = document.getElementById('video-preview'), c = document.createElement('canvas'), ctx = c.getContext('2d');
-            c.width = 600; c.height = 900;
-            ctx.drawImage(v, 0, 0, v.videoWidth, v.videoHeight, 0, 0, 600, 900);
-            ctx.fillStyle = "rgba(0, 0, 0, 0.6)"; ctx.fillRect(0, 720, 600, 180);
-            ctx.fillStyle = "white"; ctx.font = "bold 28px Poppins";
-            ctx.fillText((currentUser ? currentUser.Nama : "PROFIL").toUpperCase(), 30, 770);
-            ctx.font = "18px Poppins"; ctx.fillText((currentUser ? currentUser.Jabatan : "CALON") + " | " + selectedStatus.toUpperCase(), 30, 805);
-            ctx.font = "14px Poppins"; ctx.fillText("JAM: " + (serverTime || "--") + " | LOC: " + coordinates, 30, 840);
-            ctx.fillStyle = "#10b981"; ctx.font = "bold 12px Poppins"; ctx.fillText("✓ UPT PSDA BONDOYUDO VERIFIED", 30, 875);
-            const data = c.toDataURL('image/jpeg', 0.8);
+            const targetW = 800, targetH = 1200; // Resolusi Watermark Lebih Tinggi
+            c.width = targetW; c.height = targetH;
+            
+            // --- Logic Smart Crop Portrait ---
+            const sW = v.videoWidth, sH = v.videoHeight;
+            const targetRatio = targetW / targetH;
+            let dW, dH, dX, dY;
+            if (sW / sH > targetRatio) { dH = sH; dW = sH * targetRatio; dX = (sW - dW) / 2; dY = 0; }
+            else { dW = sW; dH = sW / targetRatio; dX = 0; dY = (sH - dH) / 2; }
+            ctx.drawImage(v, dX, dY, dW, dH, 0, 0, targetW, targetH);
+            
+            // --- DESIGN WATERMARK PRO ---
+            // 1. Overlay Gradient Bottom (Mewah)
+            const grad = ctx.createLinearGradient(0, targetH * 0.65, 0, targetH);
+            grad.addColorStop(0, "rgba(0, 0, 0, 0)");
+            grad.addColorStop(0.3, "rgba(0, 0, 0, 0.4)");
+            grad.addColorStop(1, "rgba(0, 0, 0, 0.9)");
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, targetH * 0.6, targetW, targetH * 0.4);
+
+            // 2. Garis Aksen Emerald
+            ctx.fillStyle = "#10b981";
+            ctx.fillRect(40, targetH - 240, 6, 160);
+
+            // 3. Nama Pegawai (Header)
+            ctx.fillStyle = "#FFFFFF";
+            ctx.font = "800 42px Poppins";
+            const displayName = (currentUser ? currentUser.Nama : "REGISTRASI").toUpperCase();
+            ctx.fillText(displayName, 65, targetH - 195);
+
+            // 4. Jabatan & Status
+            ctx.font = "600 26px Poppins";
+            ctx.fillStyle = "#E2E8F0";
+            const jobStatus = (currentUser ? currentUser.Jabatan : "CALON") + " | " + selectedStatus.toUpperCase();
+            ctx.fillText(jobStatus, 65, targetH - 150);
+
+            // 5. Jam Server & Lokasi (Data Teknis)
+            ctx.font = "400 20px Poppins";
+            ctx.fillStyle = "#CBD5E1";
+            ctx.fillText("WAKTU: " + (serverTime || "--:--") + " WIB", 65, targetH - 110);
+            ctx.fillText("KOORD: " + (coordinates || "GPS UNLOCKED"), 65, targetH - 80);
+
+            // 6. Verified Badge (Capsule Style)
+            const badgeText = "✓ UPT PSDA BONDOYUDO VERIFIED";
+            ctx.font = "bold 14px Poppins";
+            const bWidth = ctx.measureText(badgeText).width + 30;
+            ctx.fillStyle = "rgba(16, 185, 129, 0.2)";
+            roundRect(ctx, 60, targetH - 55, bWidth, 32, 16, true);
+            ctx.fillStyle = "#10b981";
+            ctx.fillText(badgeText, 75, targetH - 33);
+
+            const data = c.toDataURL('image/jpeg', 0.85);
             if (activeCameraMode === 'profile') {
                 profilePhotoRaw = data; document.getElementById('preview-profile').classList.remove('hidden');
                 document.getElementById('preview-profile').querySelector('img').src = data;
@@ -570,6 +614,16 @@
             }
             window.closeCamera(); window.validateForm();
         };
+
+        // Helper Canvas RoundRect
+        function roundRect(ctx, x, y, width, height, radius, fill) {
+            ctx.beginPath(); ctx.moveTo(x + radius, y); ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius); ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height); ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius); ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y); ctx.closePath();
+            if (fill) ctx.fill();
+        }
 
         window.validateForm = () => {
             const hasNotes = document.getElementById('attendance-notes').value.length >= 5;
