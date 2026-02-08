@@ -101,13 +101,14 @@
         }
         .toast-pro.show { transform: translateX(-50%) translateY(0); }
 
+        /* --- DARK SHADOWS (NO WHITE BG) --- */
         .photo-portrait-shadow {
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8);
             border: 2px solid rgba(255,255,255,0.2);
         }
 
         .icon-drop-shadow {
-            filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.5));
+            filter: drop-shadow(0 20px 20px rgba(0, 0, 0, 0.6));
         }
 
         .active-hadir { background: #10b981 !important; color: white !important; box-shadow: 0 6px 0 #065f46 !important; }
@@ -125,7 +126,7 @@
     <div class="bg-decoration bg-blue-500" style="top: 0%; left: 0%;"></div>
     <div class="bg-decoration bg-emerald-400" style="bottom: 0%; right: 0%;"></div>
 
-    <!-- TOAST ELEMENT -->
+    <!-- TOAST -->
     <div id="toast-element" class="toast-pro">
         <div id="toast-icon-box" class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">!</div>
         <div class="flex flex-col">
@@ -134,7 +135,7 @@
         </div>
     </div>
 
-    <!-- MODAL CONFIRMATION -->
+    <!-- MODAL KONFIRMASI -->
     <div id="modal-confirm" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[9500] hidden items-center justify-center p-6">
         <div class="bg-white rounded-[35px] p-8 w-full max-w-sm shadow-2xl space-y-6 text-center">
             <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto text-blue-600">
@@ -179,7 +180,7 @@
                     <div id="qr-reader" class="w-full"></div>
                 </div>
                 <div class="py-6 flex flex-col items-center gap-4">
-                    <p class="text-white/40 text-[10px] uppercase font-bold tracking-[0.2em]">Arahkan ke QR Code Pegawai</p>
+                    <p class="text-white/40 text-[10px] uppercase font-bold tracking-[0.2em]">Arahkan ke QR atau pilih galeri</p>
                     <button onclick="document.getElementById('qr-file-input').click()" class="pill-glass-3d px-6 py-3 bg-white/20 text-white font-black text-[10px] uppercase tracking-widest">
                         <i class="fas fa-image mr-2"></i> PILIH DARI GALERI
                     </button>
@@ -191,15 +192,16 @@
         <!-- SCREEN: LOGIN -->
         <div id="login-screen" class="screen screen-active justify-center space-y-10">
             <div class="flex flex-col items-center">
+                <!-- Icon No White Bg -->
                 <div class="w-24 h-24 flex items-center justify-center mb-6 icon-drop-shadow">
                     <img src="https://lh3.googleusercontent.com/d/1ognTdYTF6KwNc5aCOFl8T6UyFMcjvsnQ" class="w-full h-full object-contain" alt="Logo">
                 </div>
                 <h1 class="text-3xl font-extrabold text-slate-800 tracking-tighter text-center uppercase leading-none">UPT PSDA<br><span class="text-emerald-600">BONDOYUDO</span></h1>
-                <p class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.3em] mt-2 text-center">Professional Presence System v3.2</p>
+                <p class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.3em] mt-2 text-center">Professional Presence System v3.5</p>
             </div>
             
             <div class="space-y-4 px-4">
-                <input id="login-username" type="text" placeholder="ID / Email / HP" class="input-glass">
+                <input id="login-username" type="text" placeholder="ID / Nomor HP / Chat ID" class="input-glass">
                 <input id="login-password" type="password" placeholder="Password" class="input-glass">
                 <div class="flex items-center gap-3 px-2">
                     <input type="checkbox" id="save-session" class="w-5 h-5 rounded border-white/30 bg-white/20 text-emerald-600 focus:ring-emerald-500">
@@ -221,11 +223,11 @@
             
             <div class="flex justify-between items-end pb-4 px-6 pt-4">
                 <button onclick="window.navigateTo('forgot-screen')" class="text-left"><p class="text-[9px] text-slate-500 uppercase font-black">Lupa Sandi?</p></button>
-                <button onclick="window.navigateTo('register-screen')" class="text-right"><p class="text-emerald-700 font-bold text-xs leading-none">Daftar Akun Baru</p></button>
+                <button onclick="window.navigateTo('register-screen')" class="text-right"><p class="text-emerald-700 font-bold text-xs leading-none uppercase">Daftar Akun</p></button>
             </div>
         </div>
 
-        <!-- SCREEN: REGISTER -->
+        <!-- SCREEN: REGISTER (Separated Fields) -->
         <div id="register-screen" class="screen screen-hidden overflow-y-auto scrollbar-hide">
             <div class="flex items-center gap-4 mb-6" onclick="window.navigateTo('login-screen')">
                 <div class="p-3 bg-slate-900 text-white rounded-2xl"><i class="fas fa-chevron-left"></i></div>
@@ -249,8 +251,10 @@
                     <input id="reg-id" type="text" placeholder="ID Pegawai (P001...)" class="input-glass">
                     <input id="reg-nama" type="text" placeholder="Nama Lengkap" class="input-glass">
                     <select id="reg-di" class="input-glass" onchange="window.toggleManual(this, 'manual-di')">
-                        <option value="" disabled selected>Pilih Daerah Irigasi (DI)</option><option value="DI BARU">DI BARU</option><option value="DI POROLINGGO">DI POROLINGGO</option>
-                        <option value="manual">Lainnya...</option>
+                        <option value="" disabled selected>Pilih Daerah Irigasi (DI)</option>
+                        <option value="DI BARU">DI BARU</option>
+                        <option value="DI POROLINGGO">DI POROLINGGO</option>
+                        <option value="manual">Isi manual...</option>
                     </select>
                     <input id="manual-di" type="text" placeholder="Ketik Nama DI" class="input-glass hidden border-emerald-400">
                     <select id="reg-jabatan" class="input-glass" onchange="window.toggleManual(this, 'manual-jabatan')">
@@ -260,10 +264,11 @@
                     <input id="manual-jabatan" type="text" placeholder="Ketik Jabatan" class="input-glass hidden border-emerald-400">
                     <select id="reg-wilayah" class="input-glass">
                         <option value="" disabled selected>Pilih Wilayah</option>
-                        <option value="Bangorejo">Bangorejo</option><option value="Cluring">Cluring</option><option value="Pesanggaran">Pesanggaran</option><option value="Porolinggo">Porolinggo</option><option value="manual">Lainnya...</option>
+                        <option value="Bangorejo">Bangorejo</option><option value="Cluring">Cluring</option><option value="Pesanggaran">Pesanggaran</option><option value="Porolinggo">Porolinggo</option>
                     </select>
                     <input id="reg-email" type="email" placeholder="Email Aktif" class="input-glass">
-                    <input id="reg-hp" type="tel" placeholder="No.HP / Chat ID Telegram" class="input-glass">
+                    <input id="reg-hp" type="tel" placeholder="Nomor HP Aktif" class="input-glass">
+                    <input id="reg-chatid" type="text" placeholder="Chat ID Telegram (Bot)" class="input-glass">
                     <input id="reg-lokasi" type="text" placeholder="Lokasi Penempatan" class="input-glass">
                     <input id="reg-password" type="password" placeholder="Password Baru" class="input-glass">
                 </div>
@@ -271,27 +276,10 @@
             </div>
         </div>
 
-        <!-- SCREEN: FORGOT PASSWORD -->
-        <div id="forgot-screen" class="screen screen-hidden">
-            <div class="flex items-center gap-4 mb-10" onclick="window.navigateTo('login-screen')">
-                <div class="p-3 bg-slate-900 text-white rounded-2xl"><i class="fas fa-chevron-left"></i></div>
-                <h2 class="text-xl font-black text-slate-800">Reset Password</h2>
-            </div>
-            <div class="flex-1 flex flex-col justify-center space-y-6">
-                <div class="text-center space-y-2">
-                    <div class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
-                        <svg class="w-10 h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-width="2"/></svg>
-                    </div>
-                    <p class="text-sm text-slate-600">Detail login akan dikirim ke Telegram/Email terdaftar.</p>
-                </div>
-                <input id="forgot-input" type="text" placeholder="Email / No.HP / Chat ID" class="input-glass">
-                <button onclick="window.handleForgotPassword()" class="w-full pill-glass-3d py-5 bg-amber-600 text-white font-black text-lg shadow-[0_6px_0_#92400e]">KIRIM PERMINTAAN</button>
-            </div>
-        </div>
-
         <!-- SCREEN: PRESENSI -->
         <div id="presensi-screen" class="screen screen-hidden overflow-y-auto scrollbar-hide !px-2">
             <div class="flex flex-col items-center pt-8 mb-6">
+                <!-- Profile No Bg Shadow -->
                 <div class="rounded-[35px] relative photo-portrait-shadow overflow-hidden bg-slate-800/30 backdrop-blur-md" style="width: 130px; height: 195px;">
                     <img id="user-photo" src="" class="w-full h-full object-cover">
                     <div id="photo-v" class="absolute bottom-3 right-3 w-8 h-8 bg-emerald-50 rounded-full border-2 border-white hidden items-center justify-center text-white font-black shadow-lg"><i class="fas fa-check"></i></div>
@@ -363,6 +351,24 @@
                 <button id="final-submit" onclick="window.confirmSubmitFlow()" class="w-full pill-glass-3d !bg-slate-900 !text-white py-6 font-black text-xl tracking-[0.2em] shadow-2xl opacity-50 pointer-events-none uppercase">Kirim Presensi</button>
             </div>
         </div>
+
+        <!-- SCREEN: FORGOT -->
+        <div id="forgot-screen" class="screen screen-hidden">
+            <div class="flex items-center gap-4 mb-10" onclick="window.navigateTo('login-screen')">
+                <div class="p-3 bg-slate-900 text-white rounded-2xl"><i class="fas fa-chevron-left"></i></div>
+                <h2 class="text-xl font-black text-slate-800">Reset Password</h2>
+            </div>
+            <div class="flex-1 flex flex-col justify-center space-y-6">
+                <div class="text-center space-y-2">
+                    <div class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+                        <i class="fas fa-key text-amber-600 text-3xl"></i>
+                    </div>
+                    <p class="text-sm text-slate-600">Detail login akan dikirim ke Telegram & Email terdaftar.</p>
+                </div>
+                <input id="forgot-input" type="text" placeholder="Email / Nomor HP / Chat ID" class="input-glass">
+                <button onclick="window.handleForgotPassword()" class="w-full pill-glass-3d py-5 bg-amber-600 text-white font-black text-lg shadow-[0_6px_0_#92400e]">KIRIM PERMINTAAN</button>
+            </div>
+        </div>
     </div>
 
     <script type="module">
@@ -373,7 +379,6 @@
         try { firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "" }; }
         catch(e) { firebaseConfig = { apiKey: "" }; }
 
-        // State
         let db, auth, user, html5QrCode = null;
         let currentUser = null, currentScreen = 'login-screen', selectedStatus = "", coordinates = "", selfieRaw = null, kerjaRaw = null, activeCameraMode = null, profilePhotoRaw = null;
         let serverTime = null, dailyStatus = { hasHadir: false, hasPulang: false, hasSpecial: false, hasMargin: false };
@@ -391,14 +396,13 @@
             }
         }
 
-        // Init Firebase
         if (firebaseConfig.apiKey) {
             const app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
             onAuthStateChanged(auth, async (u) => {
                 user = u;
-                loadSession(); // Load locally saved credentials
+                loadSession();
                 if (!user) {
                     if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
                     else await signInAnonymously(auth);
@@ -406,13 +410,12 @@
             });
         }
 
-        // --- UI HELPERS ---
         window.showToast = (msg, type = "info", title = "Pemberitahuan") => {
             const toast = document.getElementById('toast-element');
             const box = document.getElementById('toast-icon-box');
             document.getElementById('toast-text').innerText = msg;
             document.getElementById('toast-title').innerText = title;
-            box.className = "w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg " + (type === "success" ? "bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.5)]" : "bg-red-500 shadow-[0_0_20px_rgba(239,68,68,0.5)]");
+            box.className = "w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg " + (type === "success" ? "bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.5)]" : "bg-red-500 shadow-[0_0_20px_rgba(239,68,68,0.5)]");
             box.innerHTML = type === "success" ? '<i class="fas fa-check"></i>' : '<i class="fas fa-exclamation"></i>';
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 4500);
@@ -435,7 +438,7 @@
 
         window.closeModal = () => { document.getElementById('modal-confirm').style.display = 'none'; };
 
-        // --- QR SCANNER (Camera + File Gallery) ---
+        // --- QR SCANNER (Camera + File Upload) ---
         window.startQRScanner = () => {
             document.getElementById('qr-scanner-overlay').style.display = 'flex';
             html5QrCode = new Html5Qrcode("qr-reader");
@@ -450,17 +453,13 @@
             if (!file) return;
             const tempScanner = new Html5Qrcode("qr-reader");
             tempScanner.scanFile(file, true)
-                .then(token => {
-                    handleQRScanResult(token);
-                })
-                .catch(err => {
-                    window.showToast("QR tidak ditemukan dalam gambar.", "error");
-                });
+                .then(token => handleQRScanResult(token))
+                .catch(err => window.showToast("QR tidak ditemukan dalam gambar.", "error"));
         };
 
         async function handleQRScanResult(token) {
             window.stopQRScanner();
-            window.showLoading(true, "Memvalidasi Token...");
+            window.showLoading(true, "Memvalidasi QR...");
             try {
                 const res = await (await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "login", type: "qr", token }) })).json();
                 if (res.status === "success") handleLoginSuccess(res.data);
@@ -481,7 +480,6 @@
             const saveCheck = document.getElementById('save-session').checked;
             if (!userInp || !passInp) return window.showToast("Isi form lengkap.", "error");
             
-            // Manage Local Memory for "Remember Me"
             if(saveCheck) {
                 localStorage.setItem('presensi_remember_user', userInp);
                 localStorage.setItem('presensi_remember_pass', passInp);
@@ -493,9 +491,8 @@
             window.showLoading(true, "Verifikasi Akun...");
             try {
                 const res = await (await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "login", username: userInp, password: passInp }) })).json();
-                if (res.status === "success") {
-                    handleLoginSuccess(res.data);
-                } else window.showToast(res.message, "error");
+                if (res.status === "success") handleLoginSuccess(res.data);
+                else window.showToast(res.message, "error");
             } catch (e) { window.showToast("Server tidak merespon.", "error"); }
             window.showLoading(false);
         };
@@ -506,7 +503,7 @@
             document.getElementById('user-job').innerText = currentUser.Jabatan;
             document.getElementById('user-photo').src = currentUser.FotoUrl;
             
-            window.showLoading(true, "Mengecek Status Harian...");
+            window.showLoading(true, "Cek Status Harian...");
             try {
                 const sRes = await (await fetch(API_URL + "?action=getTodayStatus&nama=" + encodeURIComponent(currentUser.Nama))).json();
                 dailyStatus = sRes;
@@ -519,50 +516,34 @@
 
         // --- BUSINESS LOGIC (URUTAN SISTEM) ---
         function applyBusinessRules() {
-            const btnHadir = document.getElementById('btn-hadir');
-            const btnPulang = document.getElementById('btn-pulang');
-            const btnMargin = document.getElementById('btn-margin');
-            const btnIzin = document.getElementById('btn-izin');
-            const btnCuti = document.getElementById('btn-cuti');
-            const btnSakit = document.getElementById('btn-sakit');
-            const btnDinas = document.getElementById('btn-dinas');
-            
-            btnHadir.disabled = false;
-            btnPulang.disabled = false;
-            btnMargin.disabled = false;
-            btnIzin.disabled = false;
-            btnCuti.disabled = false;
-            btnSakit.disabled = false;
-            btnDinas.disabled = false;
+            const btns = document.querySelectorAll('.status-btn');
+            btns.forEach(b => b.disabled = false);
 
             if (dailyStatus.hasSpecial) {
-                document.querySelectorAll('.status-btn').forEach(b => b.disabled = true);
+                btns.forEach(b => b.disabled = true);
                 window.showToast("Sudah ada laporan absen hari ini.", "error"); 
                 return;
             }
 
             if (dailyStatus.hasPulang) {
-                document.querySelectorAll('.status-btn').forEach(b => b.disabled = true);
+                btns.forEach(b => b.disabled = true);
                 window.showToast("Absensi hari ini sudah selesai.", "success");
                 return;
             }
 
-            // Aturan Pulang: Wajib Hadir ATAU sudah lapor Margin Error tapi TETAP harus Hadir
-            if (!dailyStatus.hasHadir) {
-                btnPulang.disabled = true;
-            }
+            if (!dailyStatus.hasHadir) document.getElementById('btn-pulang').disabled = true;
 
             if (dailyStatus.hasHadir) {
-                btnHadir.disabled = true;
-                btnMargin.disabled = true;
-                btnPulang.disabled = false;
+                document.getElementById('btn-hadir').disabled = true;
+                document.getElementById('btn-margin').disabled = true;
+                document.getElementById('btn-pulang').disabled = false;
             }
 
             if (dailyStatus.hasMargin && !dailyStatus.hasHadir) {
-                btnMargin.disabled = true;
-                btnPulang.disabled = true; 
-                btnHadir.disabled = false;
-                window.showToast("Hambatan diterima. Silakan absen HADIR saat tiba di lokasi.", "info");
+                document.getElementById('btn-margin').disabled = true;
+                document.getElementById('btn-pulang').disabled = true; 
+                document.getElementById('btn-hadir').disabled = false;
+                window.showToast("Hambatan diterima. Silakan absen HADIR saat tiba.", "info");
             }
         }
 
@@ -581,12 +562,9 @@
                 try {
                     const t = await (await fetch(API_URL + "?action=getServerTime")).json();
                     serverTime = t.formattedTime;
-                    // Logika Jam Server (07:30 = 450 Menit)
                     const [h, m] = serverTime.split(':').map(Number);
-                    const serverMinutes = h * 60 + m;
-                    if (serverMinutes > 450) {
-                        const diff = serverMinutes - 450;
-                        window.showToast(`Peringatan: Terlambat ${diff} menit.`, "error", "Jam Server");
+                    if (h * 60 + m > 450) { // 07:30
+                        window.showToast(`Peringatan: Terlambat ${h * 60 + m - 450} menit.`, "error", "Jam Server");
                     }
                 } catch(e) { serverTime = new Date().toLocaleTimeString('id-ID', {hour12: false}); }
                 window.showLoading(false);
@@ -596,12 +574,10 @@
         window.setStatus = (s, el) => {
             selectedStatus = s;
             document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active-hadir', 'active-pulang', 'active-error', 'active-special'));
-            
             let cls = 'active-special';
             if(s === 'Hadir') cls = 'active-hadir';
             if(s === 'Pulang') cls = 'active-pulang';
             if(s === 'Margin Error') cls = 'active-error';
-            
             el.classList.add(cls);
             window.validateForm();
         };
@@ -625,35 +601,22 @@
             const v = document.getElementById('video-preview'), c = document.createElement('canvas'), ctx = c.getContext('2d');
             const targetW = 800, targetH = 1200; 
             c.width = targetW; c.height = targetH;
-            
-            const sW = v.videoWidth, sH = v.videoHeight;
-            const targetRatio = targetW / targetH;
+            const sW = v.videoWidth, sH = v.videoHeight, targetRatio = targetW / targetH;
             let dW, dH, dX, dY;
             if (sW / sH > targetRatio) { dH = sH; dW = sH * targetRatio; dX = (sW - dW) / 2; dY = 0; }
             else { dW = sW; dH = sW / targetRatio; dX = 0; dY = (sH - dH) / 2; }
             ctx.drawImage(v, dX, dY, dW, dH, 0, 0, targetW, targetH);
             
+            // --- DESIGN WATERMARK PRO ---
             const grad = ctx.createLinearGradient(0, targetH * 0.65, 0, targetH);
-            grad.addColorStop(0, "rgba(0, 0, 0, 0)");
-            grad.addColorStop(1, "rgba(0, 0, 0, 0.9)");
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, targetH * 0.6, targetW, targetH * 0.4);
-
-            ctx.fillStyle = "#10b981";
-            ctx.fillRect(40, targetH - 240, 6, 160);
-
-            ctx.fillStyle = "#FFFFFF";
-            ctx.font = "800 42px Poppins";
-            const displayName = (currentUser ? currentUser.Nama : "PROFIL").toUpperCase();
-            ctx.fillText(displayName, 65, targetH - 195);
-
-            ctx.font = "600 26px Poppins";
-            ctx.fillStyle = "#E2E8F0";
-            const jobStatus = (currentUser ? currentUser.Jabatan : "CALON") + " | " + selectedStatus.toUpperCase();
-            ctx.fillText(jobStatus, 65, targetH - 150);
-
-            ctx.font = "400 20px Poppins";
-            ctx.fillStyle = "#CBD5E1";
+            grad.addColorStop(0, "rgba(0, 0, 0, 0)"); grad.addColorStop(1, "rgba(0, 0, 0, 0.9)");
+            ctx.fillStyle = grad; ctx.fillRect(0, targetH * 0.6, targetW, targetH * 0.4);
+            ctx.fillStyle = "#10b981"; ctx.fillRect(40, targetH - 240, 6, 160);
+            ctx.fillStyle = "#FFFFFF"; ctx.font = "800 42px Poppins";
+            ctx.fillText((currentUser ? currentUser.Nama : "PROFIL").toUpperCase(), 65, targetH - 195);
+            ctx.font = "600 26px Poppins"; ctx.fillStyle = "#E2E8F0";
+            ctx.fillText((currentUser ? currentUser.Jabatan : "CALON") + " | " + selectedStatus.toUpperCase(), 65, targetH - 150);
+            ctx.font = "400 20px Poppins"; ctx.fillStyle = "#CBD5E1";
             ctx.fillText("WAKTU: " + (serverTime || "--:--") + " WIB", 65, targetH - 110);
             ctx.fillText("COORD: " + (coordinates || "GPS UNLOCKED"), 65, targetH - 80);
 
@@ -662,8 +625,7 @@
             const bWidth = ctx.measureText(badgeText).width + 30;
             ctx.fillStyle = "rgba(16, 185, 129, 0.2)";
             roundRect(ctx, 60, targetH - 55, bWidth, 32, 16, true);
-            ctx.fillStyle = "#10b981";
-            ctx.fillText(badgeText, 75, targetH - 33);
+            ctx.fillStyle = "#10b981"; ctx.fillText(badgeText, 75, targetH - 33);
 
             const data = c.toDataURL('image/jpeg', 0.85);
             if (activeCameraMode === 'profile') {
@@ -703,11 +665,7 @@
 
         window.confirmSubmitFlow = () => {
             let msg = `Kirim data ${selectedStatus.toUpperCase()} ke server?`;
-            
-            if (selectedStatus === 'Margin Error') {
-                msg = "PENTING: Laporkan kendala dengan bukti foto. Setelah ini Anda TETAP WAJIB absen HADIR saat tiba di lokasi.";
-            }
-
+            if (selectedStatus === 'Margin Error') msg = "PENTING: Laporan hambatan diproses. INGAT: Anda TETAP WAJIB absen HADIR saat tiba di lokasi.";
             document.getElementById('modal-msg').innerText = msg;
             document.getElementById('confirm-submit-btn').onclick = () => { window.closeModal(); window.submitAttendance(); };
             document.getElementById('modal-confirm').style.display = 'flex';
@@ -715,31 +673,15 @@
 
         window.submitAttendance = async () => {
             window.showLoading(true, "Mengirim Presensi...");
-            
-            // Logika Skor Terlambat (Jam 07:30)
             const [h, m] = serverTime.split(':').map(Number);
             let calculatedScore = (selectedStatus === 'Hadir' && (h * 60 + m > 450)) ? 40 : 50;
             if (selectedStatus === 'Margin Error') calculatedScore = 10;
-            if (['Izin','Cuti','Sakit','Dinas'].includes(selectedStatus)) calculatedScore = 0; // Skor administratif dikelola backend
+            if (['Izin','Cuti','Sakit','Dinas'].includes(selectedStatus)) calculatedScore = 0;
 
-            const body = { 
-                action: "submitAttendance", 
-                nama: currentUser.Nama, 
-                jabatan: currentUser.Jabatan, 
-                status: selectedStatus, 
-                koordinat: coordinates, 
-                fotoSelfie: selfieRaw, 
-                fotoKerja: kerjaRaw, 
-                keterangan: document.getElementById('attendance-notes').value,
-                skor: calculatedScore 
-            };
-
+            const body = { action: "submitAttendance", nama: currentUser.Nama, jabatan: currentUser.Jabatan, status: selectedStatus, koordinat: coordinates, fotoSelfie: selfieRaw, fotoKerja: kerjaRaw, keterangan: document.getElementById('attendance-notes').value, skor: calculatedScore };
             try {
                 const res = await (await fetch(API_URL, { method: "POST", body: JSON.stringify(body) })).json();
-                if (res.status === "success") { 
-                    window.showToast(res.message, "success"); 
-                    setTimeout(() => location.reload(), 4500); 
-                }
+                if (res.status === "success") { window.showToast(res.message, "success"); setTimeout(() => location.reload(), 4500); }
                 else window.showToast(res.message, "error");
             } catch (e) { window.showToast("Gagal kirim.", "error"); }
             window.showLoading(false);
@@ -757,30 +699,14 @@
         };
 
         window.handleRegister = async () => {
-            const d = document.getElementById('reg-di').value;
-            const j = document.getElementById('reg-jabatan').value;
-            const w = document.getElementById('reg-wilayah').value;
-            const body = { 
-                action: "register", 
-                ID: document.getElementById('reg-id').value, 
-                Nama: document.getElementById('reg-nama').value, 
-                DI: d === 'manual' ? document.getElementById('manual-di').value : d,
-                Jabatan: j === 'manual' ? document.getElementById('manual-jabatan').value : j, 
-                Wilayah: w, 
-                Email: document.getElementById('reg-email').value, 
-                NomorHP: document.getElementById('reg-hp').value, 
-                LokasiPenempatan: document.getElementById('reg-lokasi').value, 
-                Password: document.getElementById('reg-password').value, 
-                FotoUrl: profilePhotoRaw 
-            };
-            if (!body.Nama || !profilePhotoRaw || !body.DI) return window.showToast("Nama, Foto, dan DI wajib diisi.", "error");
+            const d = document.getElementById('reg-di').value, j = document.getElementById('reg-jabatan').value, w = document.getElementById('reg-wilayah').value;
+            const body = { action: "register", ID: document.getElementById('reg-id').value, Nama: document.getElementById('reg-nama').value, DI: d === 'manual' ? document.getElementById('manual-di').value : d, Jabatan: j === 'manual' ? document.getElementById('manual-jabatan').value : j, Wilayah: w, Email: document.getElementById('reg-email').value, NomorHP: document.getElementById('reg-hp').value, ChatID: document.getElementById('reg-chatid').value, LokasiPenempatan: document.getElementById('reg-lokasi').value, Password: document.getElementById('reg-password').value, FotoUrl: profilePhotoRaw };
+            if (!body.Nama || !profilePhotoRaw || !body.DI || !body.ChatID) return window.showToast("Data wajib belum lengkap.", "error");
             window.showLoading(true, "Mendaftar...");
             try {
                 const res = await (await fetch(API_URL, { method: "POST", body: JSON.stringify(body) })).json();
-                if (res.status === "success") {
-                    document.getElementById('qr-display-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${res.qrToken}`;
-                    document.getElementById('modal-qr-success').style.display = 'flex';
-                } else window.showToast(res.message, "error");
+                if (res.status === "success") { window.navigateTo('login-screen'); window.showToast("Pendaftaran Berhasil!", "success"); } 
+                else window.showToast(res.message, "error");
             } catch (e) { window.showToast("Gagal mendaftar.", "error"); }
             window.showLoading(false);
         };
