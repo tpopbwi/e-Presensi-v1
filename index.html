@@ -249,10 +249,8 @@
                     <input id="reg-id" type="text" placeholder="ID Pegawai (P001...)" class="input-glass">
                     <input id="reg-nama" type="text" placeholder="Nama Lengkap" class="input-glass">
                     <select id="reg-di" class="input-glass" onchange="window.toggleManual(this, 'manual-di')">
-                        <option value="" disabled selected>Pilih Daerah Irigasi (DI)</option>
-                        <option value="DI BARU">DI BARU</option>
-                        <option value="DI POROLINGGO">DI POROLINGGO</option>
-                        <option value="manual">Isi manual...</option>
+                        <option value="" disabled selected>Pilih Daerah Irigasi (DI)</option><option value="DI BARU">DI BARU</option><option value="DI POROLINGGO">DI POROLINGGO</option>
+                        <option value="manual">Lainnya...</option>
                     </select>
                     <input id="manual-di" type="text" placeholder="Ketik Nama DI" class="input-glass hidden border-emerald-400">
                     <select id="reg-jabatan" class="input-glass" onchange="window.toggleManual(this, 'manual-jabatan')">
@@ -262,7 +260,7 @@
                     <input id="manual-jabatan" type="text" placeholder="Ketik Jabatan" class="input-glass hidden border-emerald-400">
                     <select id="reg-wilayah" class="input-glass">
                         <option value="" disabled selected>Pilih Wilayah</option>
-                        <option value="Bangorejo">Bangorejo</option><option value="Cluring">Cluring</option><option value="Pesanggaran">Pesanggaran</option><option value="Porolinggo">Porolinggo</option>
+                        <option value="Bangorejo">Bangorejo</option><option value="Cluring">Cluring</option><option value="Pesanggaran">Pesanggaran</option><option value="Porolinggo">Porolinggo</option><option value="manual">Lainnya...</option>
                     </select>
                     <input id="reg-email" type="email" placeholder="Email Aktif" class="input-glass">
                     <input id="reg-hp" type="tel" placeholder="No.HP / Chat ID Telegram" class="input-glass">
@@ -382,7 +380,7 @@
 
         const { initializeApp, getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken, getFirestore, doc, setDoc, getDoc } = window.firebaseInit;
 
-        // --- SESSION MANAGEMENT (Perangkat) ---
+        // --- SESSION MANAGEMENT (LocalStorage Only) ---
         function loadSession() {
             const savedUser = localStorage.getItem('presensi_remember_user');
             const savedPass = localStorage.getItem('presensi_remember_pass');
@@ -400,7 +398,7 @@
             db = getFirestore(app);
             onAuthStateChanged(auth, async (u) => {
                 user = u;
-                loadSession();
+                loadSession(); // Load locally saved credentials
                 if (!user) {
                     if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
                     else await signInAnonymously(auth);
@@ -437,7 +435,7 @@
 
         window.closeModal = () => { document.getElementById('modal-confirm').style.display = 'none'; };
 
-        // --- QR SCANNER (Camera + File) ---
+        // --- QR SCANNER (Camera + File Gallery) ---
         window.startQRScanner = () => {
             document.getElementById('qr-scanner-overlay').style.display = 'flex';
             html5QrCode = new Html5Qrcode("qr-reader");
@@ -483,6 +481,7 @@
             const saveCheck = document.getElementById('save-session').checked;
             if (!userInp || !passInp) return window.showToast("Isi form lengkap.", "error");
             
+            // Manage Local Memory for "Remember Me"
             if(saveCheck) {
                 localStorage.setItem('presensi_remember_user', userInp);
                 localStorage.setItem('presensi_remember_pass', passInp);
@@ -523,10 +522,18 @@
             const btnHadir = document.getElementById('btn-hadir');
             const btnPulang = document.getElementById('btn-pulang');
             const btnMargin = document.getElementById('btn-margin');
+            const btnIzin = document.getElementById('btn-izin');
+            const btnCuti = document.getElementById('btn-cuti');
+            const btnSakit = document.getElementById('btn-sakit');
+            const btnDinas = document.getElementById('btn-dinas');
             
             btnHadir.disabled = false;
             btnPulang.disabled = false;
             btnMargin.disabled = false;
+            btnIzin.disabled = false;
+            btnCuti.disabled = false;
+            btnSakit.disabled = false;
+            btnDinas.disabled = false;
 
             if (dailyStatus.hasSpecial) {
                 document.querySelectorAll('.status-btn').forEach(b => b.disabled = true);
@@ -553,7 +560,7 @@
 
             if (dailyStatus.hasMargin && !dailyStatus.hasHadir) {
                 btnMargin.disabled = true;
-                btnPulang.disabled = true; // Tetap tidak boleh pulang sebelum hadir
+                btnPulang.disabled = true; 
                 btnHadir.disabled = false;
                 window.showToast("Hambatan diterima. Silakan absen HADIR saat tiba di lokasi.", "info");
             }
@@ -713,6 +720,7 @@
             const [h, m] = serverTime.split(':').map(Number);
             let calculatedScore = (selectedStatus === 'Hadir' && (h * 60 + m > 450)) ? 40 : 50;
             if (selectedStatus === 'Margin Error') calculatedScore = 10;
+            if (['Izin','Cuti','Sakit','Dinas'].includes(selectedStatus)) calculatedScore = 0; // Skor administratif dikelola backend
 
             const body = { 
                 action: "submitAttendance", 
