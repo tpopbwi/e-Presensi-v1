@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>UPT PSDA - Pro Attendance System</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- QR Scanner Library -->
     <script src="https://unpkg.com/html5-qrcode"></script>
     
-    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -23,6 +24,7 @@
             --glass-bg: rgba(255, 255, 255, 0.25);
             --glass-border: rgba(255, 255, 255, 0.4);
             --glass-highlight: rgba(255, 255, 255, 0.7);
+            --emerald-pro: #10b981;
         }
 
         body {
@@ -56,6 +58,14 @@
             .app-container { width: 420px; height: 880px; max-height: 95vh; border-radius: 40px; border: 2px solid var(--glass-border); box-shadow: 0 50px 100px rgba(0,0,0,0.25); }
         }
 
+        .screen {
+            position: absolute; inset: 0; 
+            padding: 0.5rem; 
+            display: flex; flex-direction: column;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+            will-change: transform, opacity; z-index: 1;
+        }
+
         .pill-glass-3d {
             background: var(--glass-bg); backdrop-filter: blur(10px);
             border: 1px solid var(--glass-border); border-radius: 22px;
@@ -63,20 +73,14 @@
             transition: all 0.1s ease; position: relative; overflow: hidden;
         }
         .pill-glass-3d:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 3px 0 rgba(0,0,0,0.15); }
-        .pill-glass-3d:disabled { opacity: 0.3; filter: grayscale(1); cursor: not-allowed; }
+        .pill-glass-3d:disabled { opacity: 0.25; filter: grayscale(1); cursor: not-allowed; }
 
         .input-glass {
             background: rgba(255, 255, 255, 0.15); border: 1px solid var(--glass-border);
-            border-radius: 15px; backdrop-filter: blur(10px); box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
-            width: 100%; padding: 14px; font-weight: 600; color: #1e293b;
+            border-radius: 18px; backdrop-filter: blur(10px); box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+            width: 100%; padding: 14px 20px; font-weight: 600; color: #1e293b; outline: none;
         }
 
-        .screen {
-            position: absolute; inset: 0; padding: 20px;
-            display: flex; flex-direction: column;
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
-            will-change: transform, opacity; z-index: 1;
-        }
         .screen-hidden { transform: translateX(100%); opacity: 0; pointer-events: none; }
         .screen-prev { transform: translateX(-30%) scale(0.9); opacity: 0; pointer-events: none; }
         .screen-active { transform: translateX(0); opacity: 1; z-index: 10; }
@@ -97,26 +101,23 @@
         }
         .toast-pro.show { transform: translateX(-50%) translateY(0); }
 
+        /* --- UPDATED SHADOW STYLES --- */
         .photo-portrait-shadow {
-            box-shadow: 0 35px 80px -15px rgba(0, 0, 0, 0.8), 0 25px 40px -20px rgba(0, 0, 0, 1);
-            border: 5px solid rgba(255,255,255,0.25);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255,255,255,0.2);
         }
 
-        #modal-confirm, #modal-qr-success {
-            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px);
-            z-index: 9500; display: none; align-items: center; justify-content: center; padding: 20px;
+        .icon-drop-shadow {
+            filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.5));
         }
 
         .active-hadir { background: #10b981 !important; color: white !important; box-shadow: 0 6px 0 #065f46 !important; }
         .active-pulang { background: #f59e0b !important; color: white !important; box-shadow: 0 6px 0 #92400e !important; }
-        .active-special { background: #3b82f6 !important; color: white !important; box-shadow: 0 6px 0 #1e40af !important; }
-        .active-error { background: #334155 !important; color: white !important; box-shadow: 0 6px 0 #0f172a !important; }
+        .active-error { background: #ef4444 !important; color: white !important; box-shadow: 0 6px 0 #991b1b !important; }
 
-        .step-check { color: #10b981; font-weight: bold; font-size: 14px; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
-        
         #qr-reader { width: 100% !important; border: none !important; }
-        #qr-reader video { border-radius: 20px; }
+        #qr-reader video { border-radius: 30px; }
     </style>
 </head>
 <body>
@@ -128,47 +129,29 @@
     <div id="toast-element" class="toast-pro">
         <div id="toast-icon-box" class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">!</div>
         <div class="flex flex-col">
-            <p id="toast-title" class="text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none mb-1">Pemberitahuan</p>
+            <p id="toast-title" class="text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none mb-1">Notifikasi</p>
             <p id="toast-text" class="text-xs font-bold text-slate-800 tracking-tight"></p>
         </div>
     </div>
 
     <!-- MODAL CONFIRMATION -->
-    <div id="modal-confirm">
-        <div class="bg-white rounded-[35px] p-8 w-full max-sm shadow-2xl space-y-6">
-            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
-                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-width="2"/></svg>
+    <div id="modal-confirm" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[9500] hidden items-center justify-center p-6">
+        <div class="bg-white rounded-[35px] p-8 w-full max-w-sm shadow-2xl space-y-6 text-center">
+            <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto text-blue-600">
+                <i class="fas fa-question-circle text-3xl"></i>
             </div>
-            <div class="text-center space-y-2">
-                <h3 class="font-black text-xl text-slate-800 uppercase tracking-tighter">Konfirmasi Presensi</h3>
-                <p id="modal-msg" class="text-sm text-slate-500 font-medium"></p>
-            </div>
+            <h3 class="font-black text-xl text-slate-800 uppercase tracking-tighter leading-none">Konfirmasi</h3>
+            <p id="modal-msg" class="text-sm text-slate-500 font-medium"></p>
             <div class="flex gap-3">
                 <button onclick="window.closeModal()" class="flex-1 py-4 font-bold text-slate-400 uppercase text-xs">Batal</button>
-                <button id="confirm-submit-btn" class="flex-1 pill-glass-3d bg-slate-900 text-white font-black uppercase text-xs !shadow-[0_4px_0_#000]">Kirim</button>
+                <button id="confirm-submit-btn" class="flex-1 pill-glass-3d bg-slate-900 text-white font-black uppercase text-xs">Ya, Kirim</button>
             </div>
-        </div>
-    </div>
-
-    <!-- MODAL QR SUCCESS -->
-    <div id="modal-qr-success">
-        <div class="bg-white rounded-[40px] p-8 w-full max-w-sm shadow-2xl text-center space-y-6">
-            <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto">
-                <svg class="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-width="4"/></svg>
-            </div>
-            <h3 class="font-black text-xl text-slate-800 uppercase tracking-tighter leading-none">Berhasil!</h3>
-            <p class="text-xs text-slate-400 font-bold uppercase">QR Code Akses Login Anda</p>
-            <div class="bg-slate-50 p-4 rounded-3xl border-2 border-dashed border-emerald-200">
-                <img id="qr-display-img" src="" class="mx-auto w-48 h-48 rounded-xl" alt="QR Login">
-            </div>
-            <p class="text-[10px] text-slate-400 font-bold italic">Simpan QR ini untuk login cepat</p>
-            <button onclick="location.reload()" class="w-full pill-glass-3d bg-slate-900 text-white py-4 font-black uppercase text-sm !shadow-[0_5px_0_#000]">Selesai</button>
         </div>
     </div>
 
     <!-- GLOBAL LOADER -->
-    <div id="global-loader" class="loading-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-md hidden flex-col items-center justify-center z-[9000] text-white">
-        <div class="spinner mb-4"></div>
+    <div id="global-loader" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md hidden flex-col items-center justify-center z-[9000] text-white">
+        <div class="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4"></div>
         <p id="loader-text" class="font-bold tracking-widest text-[10px] uppercase">Sinkronisasi Server...</p>
     </div>
 
@@ -179,7 +162,7 @@
             <video id="video-preview" class="w-full h-full object-cover" autoplay playsinline></video>
             <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-96 border-2 border-emerald-500 rounded-3xl shadow-[0_0_0_1000px_rgba(0,0,0,0.7)] pointer-events-none"></div>
             <div class="absolute bottom-10 left-0 right-0 flex justify-around items-center px-10">
-                <button onclick="window.closeCamera()" class="p-4 bg-white/20 rounded-full text-white backdrop-blur-md"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2"/></svg></button>
+                <button onclick="window.closeCamera()" class="p-5 bg-white/20 rounded-full text-white backdrop-blur-md"><i class="fas fa-times text-xl"></i></button>
                 <button onclick="window.takePicture()" class="w-20 h-20 bg-white rounded-full border-8 border-white/30 shadow-2xl active:scale-90 transition"></button>
                 <div class="w-14"></div>
             </div>
@@ -189,81 +172,98 @@
         <div id="qr-scanner-overlay">
             <div class="flex-1 flex flex-col p-6">
                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-white font-black uppercase tracking-widest text-sm">Scan QR Akses</h2>
-                    <button onclick="window.stopQRScanner()" class="p-2 bg-white/10 rounded-full text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2"/></svg></button>
+                    <h2 class="text-white font-black uppercase tracking-widest text-xs">Scan QR Akses</h2>
+                    <button onclick="window.stopQRScanner()" class="p-3 bg-white/10 rounded-full text-white"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="bg-white/5 rounded-[40px] overflow-hidden p-4 border border-white/10 flex-1 flex items-center">
                     <div id="qr-reader" class="w-full"></div>
                 </div>
                 <div class="py-10 text-center">
-                    <p class="text-white/40 text-[10px] uppercase font-bold tracking-widest">Arahkan kamera ke QR Code pegawai Anda</p>
+                    <p class="text-white/40 text-[10px] uppercase font-bold tracking-[0.2em]">Arahkan ke QR Code Pegawai</p>
                 </div>
             </div>
         </div>
 
         <!-- SCREEN: LOGIN -->
-        <div id="login-screen" class="screen screen-active justify-center space-y-8 px-6">
+        <div id="login-screen" class="screen screen-active justify-center space-y-10">
             <div class="flex flex-col items-center">
-                <div class="w-24 h-24 bg-slate-900 rounded-[32px] flex items-center justify-center mb-4 shadow-2xl rotate-3 transition hover:rotate-0 duration-500">
-                    <svg viewBox="0 0 24 24" class="w-14 h-14 text-white fill-current"><path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" /></svg>
+                <!-- No bg-white, just shadow -->
+                <div class="w-24 h-24 flex items-center justify-center mb-6 icon-drop-shadow">
+                    <img src="https://lh3.googleusercontent.com/d/1ognTdYTF6KwNc5aCOFl8T6UyFMcjvsnQ" class="w-full h-full object-contain" alt="Logo">
                 </div>
                 <h1 class="text-3xl font-extrabold text-slate-800 tracking-tighter text-center uppercase leading-none">UPT PSDA<br><span class="text-emerald-600">BONDOYUDO</span></h1>
+                <p class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.3em] mt-2 text-center">Professional Presence System v3.2</p>
             </div>
-            <div class="space-y-4">
-                <input id="login-username" type="text" placeholder="Nama / Email / HP" class="input-glass">
+            
+            <div class="space-y-4 px-4">
+                <input id="login-username" type="text" placeholder="ID / Email / HP" class="input-glass">
                 <input id="login-password" type="password" placeholder="Password" class="input-glass">
-                <div class="flex items-center gap-3 px-2 py-1">
-                    <input type="checkbox" id="save-session" class="w-5 h-5 rounded border-white/30 bg-white/20 text-emerald-600 focus:ring-emerald-500 cursor-pointer">
-                    <label for="save-session" class="text-[10px] font-black text-slate-600 uppercase tracking-widest cursor-pointer">Ingat Saya</label>
+                <div class="flex items-center gap-3 px-2">
+                    <input type="checkbox" id="save-session" class="w-5 h-5 rounded border-white/30 bg-white/20 text-emerald-600 focus:ring-emerald-500">
+                    <label for="save-session" class="text-[10px] font-black text-slate-600 uppercase tracking-widest">Ingat Sesi Saya</label>
                 </div>
-                <button id="login-btn-action" onclick="window.handleLogin()" class="w-full pill-glass-3d py-4 bg-slate-900 text-white font-black text-lg shadow-[0_6px_0_#000]">MASUK</button>
+                <button id="login-btn-action" onclick="window.handleLogin()" class="w-full pill-glass-3d py-5 bg-slate-900 text-white font-black text-lg">MASUK</button>
+                
+                <div class="flex items-center gap-4 py-2 opacity-30">
+                    <div class="flex-1 h-[1px] bg-slate-800"></div>
+                    <span class="text-[9px] font-black uppercase">Atau</span>
+                    <div class="flex-1 h-[1px] bg-slate-800"></div>
+                </div>
+                
+                <button onclick="window.startQRScanner()" class="w-full pill-glass-3d py-4 flex items-center justify-center gap-3 font-extrabold text-slate-700 bg-white/50">
+                    <i class="fas fa-qrcode text-emerald-600 text-xl"></i>
+                    SCAN QR LOGIN
+                </button>
             </div>
-            <div class="flex items-center gap-4 py-2 opacity-50"><div class="flex-1 h-[1px] bg-slate-400"></div><span class="text-[10px] font-bold uppercase">Atau</span><div class="flex-1 h-[1px] bg-slate-400"></div></div>
-            <button onclick="window.startQRScanner()" class="w-full pill-glass-3d py-4 flex items-center justify-center gap-3 font-extrabold text-slate-700 bg-white/40">
-                <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h3m-3-3H8" stroke-width="2.5"/></svg>
-                SCAN QR LOGIN
-            </button>
-            <div class="flex justify-between items-end pb-4 pt-4 px-2">
-                <button onclick="window.navigateTo('forgot-screen')" class="text-left group focus:outline-none"><p class="text-slate-800 font-bold text-xs leading-none">Password</p><p class="text-[10px] text-slate-500 uppercase group-hover:underline">Lupa Sandi?</p></button>
-                <button onclick="window.navigateTo('register-screen')" class="text-right group focus:outline-none"><p class="text-emerald-700 font-bold text-xs leading-none">Register</p><p class="text-[10px] text-slate-500 uppercase underline">Daftar Akun</p></button>
+            
+            <div class="flex justify-between items-end pb-4 px-6 pt-4">
+                <button onclick="window.navigateTo('forgot-screen')" class="text-left"><p class="text-[9px] text-slate-500 uppercase font-black">Lupa Sandi?</p></button>
+                <button onclick="window.navigateTo('register-screen')" class="text-right"><p class="text-emerald-700 font-bold text-xs leading-none">Daftar Akun Baru</p></button>
             </div>
         </div>
 
         <!-- SCREEN: REGISTER -->
         <div id="register-screen" class="screen screen-hidden overflow-y-auto scrollbar-hide">
-            <div class="flex items-center gap-4 mb-8" onclick="window.navigateTo('login-screen')">
-                <div class="p-2 bg-slate-900/10 rounded-xl"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg></div>
-                <h2 class="text-xl font-black text-slate-800 tracking-tight">Pendaftaran Pegawai</h2>
+            <div class="flex items-center gap-4 mb-6" onclick="window.navigateTo('login-screen')">
+                <div class="p-3 bg-slate-900 text-white rounded-2xl"><i class="fas fa-chevron-left"></i></div>
+                <h2 class="text-xl font-black text-slate-800 tracking-tight uppercase">Registrasi</h2>
             </div>
-            <div class="space-y-6 pb-12">
+            <div class="space-y-6 pb-12 px-2">
                 <div class="flex flex-col items-center space-y-4">
-                    <div class="w-32 h-48 rounded-[25px] relative photo-portrait-shadow overflow-hidden bg-slate-300">
+                    <!-- Photo Registration Container -->
+                    <div class="w-32 h-48 rounded-[30px] relative photo-portrait-shadow overflow-hidden bg-slate-800/20 backdrop-blur-md">
                         <div id="preview-profile" class="absolute inset-0 hidden"><img class="w-full h-full object-cover"></div>
                         <div id="placeholder-reg-photo" class="absolute inset-0 flex items-center justify-center">
-                            <svg id="placeholder-icon" class="w-12 h-12 text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                            <i class="fas fa-user-circle text-5xl text-slate-400"></i>
                         </div>
                     </div>
                     <div class="flex gap-4">
-                        <button onclick="window.openCamera('profile')" class="pill-glass-3d p-3 bg-white/50 text-slate-700 flex items-center gap-2 text-xs font-bold"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Foto</button>
-                        <button onclick="document.getElementById('file-upload-profile').click()" class="pill-glass-3d p-3 bg-white/50 text-slate-700 flex items-center gap-2 text-xs font-bold"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>Upload</button>
+                        <button onclick="window.openCamera('profile')" class="pill-glass-3d px-4 py-2 bg-white/50 text-slate-700 flex items-center gap-2 text-[10px] font-black uppercase"><i class="fas fa-camera"></i> Foto</button>
+                        <button onclick="document.getElementById('file-upload-profile').click()" class="pill-glass-3d px-4 py-2 bg-white/50 text-slate-700 flex items-center gap-2 text-[10px] font-black uppercase"><i class="fas fa-upload"></i> Upload</button>
                         <input type="file" id="file-upload-profile" class="hidden" accept="image/*" onchange="window.handleFileUpload(event)">
                     </div>
                 </div>
-                <div class="space-y-4">
+                <div class="space-y-3">
                     <input id="reg-id" type="text" placeholder="ID Pegawai (P001...)" class="input-glass">
                     <input id="reg-nama" type="text" placeholder="Nama Lengkap" class="input-glass">
+                    <select id="reg-di" class="input-glass" onchange="window.toggleManual(this, 'manual-di')">
+                        <option value="" disabled selected>Pilih Daerah Irigasi (DI)</option>
+                        <option value="DI BARU">DI BARU</option>
+                        <option value="DI POROLINGGO">DI POROLINGGO</option>
+                        <option value="manual">Isi manual...</option>
+                    </select>
+                    <input id="manual-di" type="text" placeholder="Ketik Nama DI" class="input-glass hidden border-emerald-400">
                     <select id="reg-jabatan" class="input-glass" onchange="window.toggleManual(this, 'manual-jabatan')">
                         <option value="" disabled selected>Pilih Jabatan</option>
-                        <option value="PPA">PPA</option><option value="Pekarya">Pekarya</option><option value="Staf Pengamat">Staf Pengamat</option><option value="manual">Isi manual...</option>
+                        <option value="PPA">PPA</option><option value="Pekarya">Pekarya</option><option value="Staf Pengamat">Staf Pengamat</option><option value="manual">Lainnya...</option>
                     </select>
                     <input id="manual-jabatan" type="text" placeholder="Ketik Jabatan" class="input-glass hidden border-emerald-400">
-                    <select id="reg-wilayah" class="input-glass" onchange="window.toggleManual(this, 'manual-wilayah')">
+                    <select id="reg-wilayah" class="input-glass">
                         <option value="" disabled selected>Pilih Wilayah</option>
-                        <option value="Bangorejo">Bangorejo</option><option value="Cluring">Cluring</option><option value="Pesanggaran">Pesanggaran</option><option value="Porolinggo">Porolinggo</option><option value="manual">Isi manual...</option>
+                        <option value="Bangorejo">Bangorejo</option><option value="Cluring">Cluring</option><option value="Pesanggaran">Pesanggaran</option><option value="Porolinggo">Porolinggo</option>
                     </select>
-                    <input id="manual-wilayah" type="text" placeholder="Ketik Wilayah" class="input-glass hidden border-emerald-400">
                     <input id="reg-email" type="email" placeholder="Email Aktif" class="input-glass">
-                    <input id="reg-hp" type="tel" placeholder="Chat ID Telegram (Bot User Info)" class="input-glass">
+                    <input id="reg-hp" type="tel" placeholder="No.HP / Chat ID Telegram" class="input-glass">
                     <input id="reg-lokasi" type="text" placeholder="Lokasi Penempatan" class="input-glass">
                     <input id="reg-password" type="password" placeholder="Password Baru" class="input-glass">
                 </div>
@@ -274,93 +274,94 @@
         <!-- SCREEN: FORGOT PASSWORD -->
         <div id="forgot-screen" class="screen screen-hidden">
             <div class="flex items-center gap-4 mb-10" onclick="window.navigateTo('login-screen')">
-                <div class="p-2 bg-slate-900/10 rounded-xl"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg></div>
+                <div class="p-3 bg-slate-900 text-white rounded-2xl"><i class="fas fa-chevron-left"></i></div>
                 <h2 class="text-xl font-black text-slate-800">Reset Password</h2>
             </div>
             <div class="flex-1 flex flex-col justify-center space-y-6">
                 <div class="text-center space-y-2">
-                    <div class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+                    <div class="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
                         <svg class="w-10 h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-width="2"/></svg>
                     </div>
                     <p class="text-sm text-slate-600">Detail login akan dikirim ke Telegram/Email terdaftar.</p>
                 </div>
-                <input id="forgot-input" type="text" placeholder="Email / Chat ID Telegram" class="input-glass">
+                <input id="forgot-input" type="text" placeholder="Email / No.HP / Chat ID" class="input-glass">
                 <button onclick="window.handleForgotPassword()" class="w-full pill-glass-3d py-5 bg-amber-600 text-white font-black text-lg shadow-[0_6px_0_#92400e]">KIRIM PERMINTAAN</button>
             </div>
         </div>
 
         <!-- SCREEN: PRESENSI -->
-        <div id="presensi-screen" class="screen screen-hidden overflow-y-auto scrollbar-hide !px-0">
-            <div class="flex flex-col items-center pt-8 px-6 mb-4">
-                <div class="rounded-[35px] relative photo-portrait-shadow overflow-hidden" style="width: 120px; height: 180px;">
-                    <img id="user-photo" src="" class="w-full h-full object-cover bg-white">
-                    <div id="photo-v" class="absolute bottom-2 right-2 w-8 h-8 bg-emerald-500 rounded-full border-2 border-white hidden items-center justify-center text-white text-xs font-black shadow-lg">V</div>
+        <div id="presensi-screen" class="screen screen-hidden overflow-y-auto scrollbar-hide !px-2">
+            <div class="flex flex-col items-center pt-8 mb-6">
+                <!-- Profile Image with Dark Shadow and no white bg -->
+                <div class="rounded-[35px] relative photo-portrait-shadow overflow-hidden bg-slate-800/30 backdrop-blur-md" style="width: 130px; height: 195px;">
+                    <img id="user-photo" src="" class="w-full h-full object-cover">
+                    <div id="photo-v" class="absolute bottom-3 right-3 w-8 h-8 bg-emerald-500 rounded-full border-2 border-white hidden items-center justify-center text-white font-black shadow-lg"><i class="fas fa-check"></i></div>
                 </div>
-                <div class="mt-5 text-center px-4">
-                    <h2 id="user-name" class="text-2xl font-black text-slate-800 tracking-tight leading-none mb-1 uppercase">...</h2>
-                    <p id="user-job" class="text-[10px] font-bold text-emerald-600 tracking-widest uppercase">...</p>
-                    <div id="gps-status-container" class="mt-3 px-5 py-2 bg-white/50 rounded-full border border-white inline-flex items-center gap-2 shadow-sm">
+                <div class="mt-6 text-center px-4">
+                    <h2 id="user-name" class="text-2xl font-black text-slate-800 tracking-tighter leading-none mb-1 uppercase">...</h2>
+                    <p id="user-job" class="text-[10px] font-bold text-emerald-600 tracking-[0.2em] uppercase">...</p>
+                    <div class="mt-4 px-6 py-2.5 bg-white/50 rounded-full border border-white inline-flex items-center gap-2 shadow-sm">
                         <div id="gps-dot" class="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></div>
-                        <span id="gps-text" class="text-[10px] font-black uppercase tracking-tight">Kunci Lokasi GPS</span>
-                        <span id="gps-v" class="hidden text-emerald-600 font-bold text-xs ml-1">V</span>
+                        <span id="gps-text" class="text-[10px] font-black uppercase tracking-widest">Kunci GPS Lokasi</span>
+                        <i id="gps-v" class="fas fa-check-circle hidden text-emerald-600"></i>
                     </div>
                 </div>
             </div>
 
-            <div class="px-6 mb-4">
-                <button id="lock-gps-btn" onclick="window.getRealLocation()" class="w-full pill-glass-3d py-5 bg-emerald-600 text-white font-black text-sm uppercase tracking-widest !shadow-[0_6px_0_#064e3b]">AMBIL KOORDINAT (STEP 1)</button>
+            <div class="px-2 mb-4">
+                <button id="lock-gps-btn" onclick="window.getRealLocation()" class="w-full pill-glass-3d py-5 bg-emerald-600 text-white font-black text-sm uppercase tracking-widest">
+                    <i class="fas fa-location-crosshairs mr-2"></i> AMBIL KOORDINAT (STEP 1)
+                </button>
             </div>
 
-            <div id="attendance-form" class="locked-section space-y-8 bg-white/20 border-y border-white/40 py-10 px-6 shadow-2xl mb-8 w-full rounded-[55px]">
+            <div id="attendance-form" class="locked-section space-y-8 bg-white/30 border-y border-white/40 py-10 px-4 shadow-2xl mb-8 w-full rounded-[50px]">
                 <div class="space-y-4">
-                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Kategori Presensi <span id="status-v" class="step-check hidden ml-2">V Terpilih</span></label>
+                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-3">Kategori Presensi</label>
                     <div class="grid grid-cols-2 gap-4">
-                        <button id="btn-hadir" onclick="window.setStatus('Hadir', this)" class="status-btn pill-glass-3d py-6 font-black text-xs uppercase">Hadir</button>
-                        <button id="btn-pulang" onclick="window.setStatus('Pulang', this)" class="status-btn pill-glass-3d py-6 font-black text-xs uppercase">Pulang</button>
+                        <button id="btn-hadir" onclick="window.setStatus('Hadir', this)" class="status-btn pill-glass-3d py-6 font-black text-sm uppercase">Hadir</button>
+                        <button id="btn-pulang" onclick="window.setStatus('Pulang', this)" class="status-btn pill-glass-3d py-6 font-black text-sm uppercase">Pulang</button>
                     </div>
-                    <div class="grid grid-cols-3 gap-3">
+                    <div class="grid grid-cols-4 gap-2">
                         <button id="btn-izin" onclick="window.setStatus('Izin', this)" class="status-btn pill-glass-3d py-4 font-bold text-[9px] uppercase">Izin</button>
                         <button id="btn-cuti" onclick="window.setStatus('Cuti', this)" class="status-btn pill-glass-3d py-4 font-bold text-[9px] uppercase">Cuti</button>
                         <button id="btn-sakit" onclick="window.setStatus('Sakit', this)" class="status-btn pill-glass-3d py-4 font-bold text-[9px] uppercase">Sakit</button>
                         <button id="btn-dinas" onclick="window.setStatus('Dinas', this)" class="status-btn pill-glass-3d py-4 font-bold text-[9px] uppercase">Dinas</button>
-                        <button id="btn-margin" onclick="window.setStatus('Margin Error', this)" class="status-btn pill-glass-3d py-4 font-bold text-red-600 uppercase col-span-2 tracking-tighter">Margin Error</button>
                     </div>
-                    <div id="duration-box" class="hidden mt-4 bg-white/30 p-4 rounded-3xl border border-white/50">
-                         <label class="text-[10px] font-black text-blue-700 uppercase mb-2 block tracking-widest text-center">Rentang (Hari)</label>
-                         <input id="rentang-waktu" type="number" min="1" max="30" value="1" class="input-glass !py-4 !text-center !text-lg !font-black !text-blue-800">
+                    <div class="w-full">
+                         <button id="btn-margin" onclick="window.setStatus('Margin Error', this)" class="status-btn w-full pill-glass-3d py-4 font-bold text-red-600 uppercase tracking-tighter">Hambatan (Margin Error)</button>
                     </div>
                 </div>
 
                 <div class="space-y-2">
-                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Catatan Aktivitas <span id="notes-v" class="step-check hidden ml-2">V Terisi</span></label>
-                    <textarea id="attendance-notes" oninput="window.validateForm()" class="input-glass !h-36 resize-none focus:outline-none" placeholder="Tulis rincian tugas atau kendala hari ini..."></textarea>
+                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-3">Keterangan Aktivitas</label>
+                    <textarea id="attendance-notes" oninput="window.validateForm()" class="input-glass !h-36 resize-none focus:ring-4 focus:ring-emerald-100" placeholder="Rincian tugas atau alasan kendala..."></textarea>
                 </div>
 
                 <div class="space-y-4">
-                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Lampiran Media <span id="media-v" class="step-check hidden ml-2">V Lengkap</span></label>
+                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-3">Lampiran Media</label>
                     <div class="grid grid-cols-2 gap-5">
                         <div class="relative">
-                            <button onclick="window.openCamera('selfie')" class="w-full pill-glass-3d aspect-square flex flex-col items-center justify-center gap-2 overflow-hidden">
+                            <button onclick="window.openCamera('selfie')" class="w-full pill-glass-3d aspect-square flex flex-col items-center justify-center gap-3 overflow-hidden">
                                 <div id="preview-selfie" class="absolute inset-0 hidden"><img class="w-full h-full object-cover"></div>
-                                <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-width="1.5"/></svg>
-                                <span class="text-[9px] font-black uppercase text-slate-500">Selfie</span>
+                                <i class="fas fa-user-camera text-3xl text-slate-300"></i>
+                                <span class="text-[9px] font-black uppercase text-slate-400">Selfie</span>
                             </button>
-                            <button id="retry-selfie" onclick="window.openCamera('selfie')" class="absolute -top-2 -right-2 bg-white text-red-500 p-2 rounded-full hidden shadow-lg border border-red-100"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-width="3"/></svg></button>
+                            <button id="retry-selfie" onclick="window.openCamera('selfie')" class="absolute -top-2 -right-2 bg-white text-red-500 p-2 rounded-full hidden shadow-lg border border-red-50"><i class="fas fa-redo"></i></button>
                         </div>
                         <div class="relative">
-                            <button onclick="window.openCamera('kerja')" class="w-full pill-glass-3d aspect-square flex flex-col items-center justify-center gap-2 overflow-hidden">
+                            <button onclick="window.openCamera('kerja')" class="w-full pill-glass-3d aspect-square flex flex-col items-center justify-center gap-3 overflow-hidden">
                                 <div id="preview-kerja" class="absolute inset-0 hidden"><img class="w-full h-full object-cover"></div>
-                                <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-width="1.5"/></svg>
-                                <span class="text-[9px] font-black uppercase text-slate-500">Lokasi</span>
+                                <i class="fas fa-map-location-dot text-3xl text-slate-300"></i>
+                                <span class="text-[9px] font-black uppercase text-slate-400">Lokasi</span>
                             </button>
-                            <button id="retry-kerja" onclick="window.openCamera('kerja')" class="absolute -top-2 -right-2 bg-white text-red-500 p-2 rounded-full hidden shadow-lg border border-red-100"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-width="3"/></svg></button>
+                            <button id="retry-kerja" onclick="window.openCamera('kerja')" class="absolute -top-2 -right-2 bg-white text-red-500 p-2 rounded-full hidden shadow-lg border border-red-50"><i class="fas fa-redo"></i></button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="px-6 pb-12">
-                <button id="final-submit" onclick="window.confirmSubmitFlow()" class="w-full pill-glass-3d !bg-slate-900 !text-white py-6 font-black text-xl tracking-[0.2em] shadow-2xl opacity-50 pointer-events-none">KIRIM ABSENSI</button>
+            <div class="px-4 pb-12">
+                <button id="final-submit" onclick="window.confirmSubmitFlow()" class="w-full pill-glass-3d !bg-slate-900 !text-white py-6 font-black text-xl tracking-[0.2em] shadow-2xl opacity-50 pointer-events-none uppercase">Kirim Presensi</button>
             </div>
         </div>
     </div>
@@ -412,7 +413,7 @@
             document.getElementById('toast-text').innerText = msg;
             document.getElementById('toast-title').innerText = title;
             box.className = "w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg " + (type === "success" ? "bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.5)]" : "bg-red-500 shadow-[0_0_20px_rgba(239,68,68,0.5)]");
-            box.innerText = type === "success" ? "✓" : "!";
+            box.innerHTML = type === "success" ? '<i class="fas fa-check"></i>' : '<i class="fas fa-exclamation"></i>';
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 4500);
         };
@@ -481,21 +482,56 @@
             document.getElementById('user-name').innerText = currentUser.Nama;
             document.getElementById('user-job').innerText = currentUser.Jabatan;
             document.getElementById('user-photo').src = currentUser.FotoUrl;
-            const sRes = await (await fetch(API_URL + "?action=getTodayStatus&nama=" + encodeURIComponent(currentUser.Nama))).json();
-            dailyStatus = sRes;
-            applyBusinessRules();
-            window.navigateTo('presensi-screen');
-            window.showToast("Selamat Datang!", "success");
+            
+            window.showLoading(true, "Mengecek Status Harian...");
+            try {
+                const sRes = await (await fetch(API_URL + "?action=getTodayStatus&nama=" + encodeURIComponent(currentUser.Nama))).json();
+                dailyStatus = sRes;
+                applyBusinessRules();
+                window.navigateTo('presensi-screen');
+                window.showToast("Selamat Datang!", "success");
+            } catch (e) { window.showToast("Gagal cek status harian.", "error"); }
+            window.showLoading(false);
         }
 
+        // --- BUSINESS LOGIC (PENTING: Urutan Sistem) ---
         function applyBusinessRules() {
+            const btnHadir = document.getElementById('btn-hadir');
+            const btnPulang = document.getElementById('btn-pulang');
+            const btnMargin = document.getElementById('btn-margin');
+            
+            btnHadir.disabled = false;
+            btnPulang.disabled = false;
+            btnMargin.disabled = false;
+
             if (dailyStatus.hasSpecial) {
                 document.querySelectorAll('.status-btn').forEach(b => b.disabled = true);
-                window.showToast("Sudah absen khusus hari ini.", "error"); return;
+                window.showToast("Sudah ada laporan absen hari ini.", "error"); 
+                return;
             }
-            document.getElementById('btn-hadir').disabled = dailyStatus.hasHadir;
-            document.getElementById('btn-pulang').disabled = dailyStatus.hasPulang;
-            document.getElementById('btn-margin').disabled = dailyStatus.hasHadir || dailyStatus.hasMargin;
+
+            if (dailyStatus.hasPulang) {
+                document.querySelectorAll('.status-btn').forEach(b => b.disabled = true);
+                window.showToast("Absensi hari ini sudah selesai.", "success");
+                return;
+            }
+
+            if (!dailyStatus.hasHadir && !dailyStatus.hasMargin) {
+                btnPulang.disabled = true;
+            }
+
+            if (dailyStatus.hasHadir) {
+                btnHadir.disabled = true;
+                btnMargin.disabled = true;
+                btnPulang.disabled = false;
+            }
+
+            if (dailyStatus.hasMargin && !dailyStatus.hasHadir) {
+                btnMargin.disabled = true;
+                btnPulang.disabled = true;
+                btnHadir.disabled = false;
+                window.showToast("Laporan hambatan diterima. Silakan absen HADIR saat tiba.", "info");
+            }
         }
 
         // --- GPS & CAMERA ---
@@ -508,24 +544,25 @@
                 document.getElementById('gps-dot').className = "w-2.5 h-2.5 bg-emerald-500 rounded-full shadow-[0_0_10px_#10b981]";
                 document.getElementById('gps-v').classList.remove('hidden');
                 document.getElementById('lock-gps-btn').style.display = "none";
-                document.getElementById('attendance-form').className = "unlocked-section space-y-8 bg-white/20 border-y border-white/40 py-10 px-6 shadow-2xl mb-8 w-full rounded-[55px]";
+                document.getElementById('attendance-form').className = "unlocked-section space-y-8 bg-white/20 border-y border-white/40 py-10 px-4 shadow-2xl mb-8 w-full rounded-[55px]";
                 try {
                     const t = await (await fetch(API_URL + "?action=getServerTime")).json();
                     serverTime = t.formattedTime;
-                    const [h, m] = serverTime.split(':').map(Number);
-                    if (h*60+m > 450) window.showToast(`Terlambat: ${h*60+m-450} mnt.`, "error", "Waktu Server");
                 } catch(e) { serverTime = new Date().toLocaleTimeString('id-ID', {hour12: false}); }
                 window.showLoading(false);
             }, () => { window.showLoading(false); window.showToast("Gagal lokasi. Aktifkan GPS.", "error"); }, { enableHighAccuracy: true, timeout: 35000 });
         };
 
         window.setStatus = (s, el) => {
-            if (s === 'Pulang' && !dailyStatus.hasHadir && !dailyStatus.hasMargin && selectedStatus !== 'Margin Error') return window.showToast("Wajib Hadir dulu.", "error");
             selectedStatus = s;
-            document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active-hadir', 'active-pulang', 'active-special', 'active-error'));
-            el.classList.add(s === 'Hadir' ? 'active-hadir' : (s === 'Pulang' ? 'active-pulang' : (s === 'Margin Error' ? 'active-error' : 'active-special')));
-            document.getElementById('status-v').classList.remove('hidden');
-            document.getElementById('duration-box').classList.toggle('hidden', !['Izin', 'Cuti', 'Sakit', 'Dinas'].includes(s));
+            document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active-hadir', 'active-pulang', 'active-error', 'active-special'));
+            
+            let cls = 'active-special';
+            if(s === 'Hadir') cls = 'active-hadir';
+            if(s === 'Pulang') cls = 'active-pulang';
+            if(s === 'Margin Error') cls = 'active-error';
+            
+            el.classList.add(cls);
             window.validateForm();
         };
 
@@ -546,10 +583,9 @@
 
         window.takePicture = () => {
             const v = document.getElementById('video-preview'), c = document.createElement('canvas'), ctx = c.getContext('2d');
-            const targetW = 800, targetH = 1200; // Resolusi Watermark Lebih Tinggi
+            const targetW = 800, targetH = 1200; 
             c.width = targetW; c.height = targetH;
             
-            // --- Logic Smart Crop Portrait ---
             const sW = v.videoWidth, sH = v.videoHeight;
             const targetRatio = targetW / targetH;
             let dW, dH, dX, dY;
@@ -558,37 +594,30 @@
             ctx.drawImage(v, dX, dY, dW, dH, 0, 0, targetW, targetH);
             
             // --- DESIGN WATERMARK PRO ---
-            // 1. Overlay Gradient Bottom (Mewah)
             const grad = ctx.createLinearGradient(0, targetH * 0.65, 0, targetH);
             grad.addColorStop(0, "rgba(0, 0, 0, 0)");
-            grad.addColorStop(0.3, "rgba(0, 0, 0, 0.4)");
             grad.addColorStop(1, "rgba(0, 0, 0, 0.9)");
             ctx.fillStyle = grad;
             ctx.fillRect(0, targetH * 0.6, targetW, targetH * 0.4);
 
-            // 2. Garis Aksen Emerald
             ctx.fillStyle = "#10b981";
             ctx.fillRect(40, targetH - 240, 6, 160);
 
-            // 3. Nama Pegawai (Header)
             ctx.fillStyle = "#FFFFFF";
             ctx.font = "800 42px Poppins";
-            const displayName = (currentUser ? currentUser.Nama : "REGISTRASI").toUpperCase();
+            const displayName = (currentUser ? currentUser.Nama : "PROFIL").toUpperCase();
             ctx.fillText(displayName, 65, targetH - 195);
 
-            // 4. Jabatan & Status
             ctx.font = "600 26px Poppins";
             ctx.fillStyle = "#E2E8F0";
             const jobStatus = (currentUser ? currentUser.Jabatan : "CALON") + " | " + selectedStatus.toUpperCase();
             ctx.fillText(jobStatus, 65, targetH - 150);
 
-            // 5. Jam Server & Lokasi (Data Teknis)
             ctx.font = "400 20px Poppins";
             ctx.fillStyle = "#CBD5E1";
             ctx.fillText("WAKTU: " + (serverTime || "--:--") + " WIB", 65, targetH - 110);
-            ctx.fillText("KOORD: " + (coordinates || "GPS UNLOCKED"), 65, targetH - 80);
+            ctx.fillText("COORD: " + (coordinates || "GPS UNLOCKED"), 65, targetH - 80);
 
-            // 6. Verified Badge (Capsule Style)
             const badgeText = "✓ UPT PSDA BONDOYUDO VERIFIED";
             ctx.font = "bold 14px Poppins";
             const bWidth = ctx.measureText(badgeText).width + 30;
@@ -615,7 +644,6 @@
             window.closeCamera(); window.validateForm();
         };
 
-        // Helper Canvas RoundRect
         function roundRect(ctx, x, y, width, height, radius, fill) {
             ctx.beginPath(); ctx.moveTo(x + radius, y); ctx.lineTo(x + width - radius, y);
             ctx.quadraticCurveTo(x + width, y, x + width, y + radius); ctx.lineTo(x + width, y + height - radius);
@@ -627,32 +655,39 @@
 
         window.validateForm = () => {
             const hasNotes = document.getElementById('attendance-notes').value.length >= 5;
-            document.getElementById('notes-v').classList.toggle('hidden', !hasNotes);
-            document.getElementById('media-v').classList.toggle('hidden', !(selfieRaw && kerjaRaw));
+            const hasMedia = (selfieRaw && kerjaRaw);
             const btn = document.getElementById('final-submit');
-            if (selectedStatus && hasNotes && selfieRaw && kerjaRaw) {
+            if (selectedStatus && hasNotes && hasMedia) {
                 btn.classList.replace('opacity-50', 'opacity-100'); btn.classList.replace('pointer-events-none', 'pointer-events-auto');
             } else { btn.classList.replace('opacity-100', 'opacity-50'); btn.classList.add('pointer-events-none'); }
         };
 
         window.confirmSubmitFlow = () => {
-            document.getElementById('modal-msg').innerText = `Kirim data ${selectedStatus.toUpperCase()} ke server?`;
+            let msg = `Kirim data ${selectedStatus.toUpperCase()} ke server?`;
+            
+            if (selectedStatus === 'Margin Error') {
+                msg = "PERINGATAN: Laporkan kendala dengan foto & keterangan akurat. \n\nINGAT: Setelah ini Anda TETAP WAJIB melakukan absensi HADIR saat tiba di lokasi.";
+            }
+
+            document.getElementById('modal-msg').innerText = msg;
             document.getElementById('confirm-submit-btn').onclick = () => { window.closeModal(); window.submitAttendance(); };
             document.getElementById('modal-confirm').style.display = 'flex';
         };
 
         window.submitAttendance = async () => {
             window.showLoading(true, "Mengirim Presensi...");
-            const body = { action: "submitAttendance", nama: currentUser.Nama, jabatan: currentUser.Jabatan, status: selectedStatus, koordinat: coordinates, fotoSelfie: selfieRaw, fotoKerja: kerjaRaw, keterangan: document.getElementById('attendance-notes').value + (['Izin','Cuti','Sakit','Dinas'].includes(selectedStatus) ? ` [${document.getElementById('rentang-waktu').value} Hari]` : "") };
+            const body = { action: "submitAttendance", nama: currentUser.Nama, jabatan: currentUser.Jabatan, status: selectedStatus, koordinat: coordinates, fotoSelfie: selfieRaw, fotoKerja: kerjaRaw, keterangan: document.getElementById('attendance-notes').value };
             try {
                 const res = await (await fetch(API_URL, { method: "POST", body: JSON.stringify(body) })).json();
-                if (res.status === "success") { window.showToast(res.message, "success"); setTimeout(() => location.reload(), 4500); }
+                if (res.status === "success") { 
+                    window.showToast(res.message, "success"); 
+                    setTimeout(() => location.reload(), 4500); 
+                }
                 else window.showToast(res.message, "error");
             } catch (e) { window.showToast("Gagal kirim.", "error"); }
             window.showLoading(false);
         };
 
-        // --- REGISTRATION ---
         window.toggleManual = (sel, id) => document.getElementById(id).classList.toggle('hidden', sel.value !== 'manual');
         window.handleFileUpload = (e) => {
             const reader = new FileReader();
@@ -664,9 +699,23 @@
         };
 
         window.handleRegister = async () => {
-            const j = document.getElementById('reg-jabatan').value, w = document.getElementById('reg-wilayah').value;
-            const body = { action: "register", ID: document.getElementById('reg-id').value, Nama: document.getElementById('reg-nama').value, Jabatan: j === 'manual' ? document.getElementById('manual-jabatan').value : j, Wilayah: w === 'manual' ? document.getElementById('manual-wilayah').value : w, Email: document.getElementById('reg-email').value, NomorHP: document.getElementById('reg-hp').value, LokasiPenempatan: document.getElementById('reg-lokasi').value, Password: document.getElementById('reg-password').value, FotoUrl: profilePhotoRaw };
-            if (!body.Nama || !profilePhotoRaw) return window.showToast("Isi Nama & Foto.", "error");
+            const d = document.getElementById('reg-di').value;
+            const j = document.getElementById('reg-jabatan').value;
+            const w = document.getElementById('reg-wilayah').value;
+            const body = { 
+                action: "register", 
+                ID: document.getElementById('reg-id').value, 
+                Nama: document.getElementById('reg-nama').value, 
+                DI: d === 'manual' ? document.getElementById('manual-di').value : d,
+                Jabatan: j === 'manual' ? document.getElementById('manual-jabatan').value : j, 
+                Wilayah: w, 
+                Email: document.getElementById('reg-email').value, 
+                NomorHP: document.getElementById('reg-hp').value, 
+                LokasiPenempatan: document.getElementById('reg-lokasi').value, 
+                Password: document.getElementById('reg-password').value, 
+                FotoUrl: profilePhotoRaw 
+            };
+            if (!body.Nama || !profilePhotoRaw || !body.DI) return window.showToast("Nama, Foto, dan DI wajib diisi.", "error");
             window.showLoading(true, "Mendaftar...");
             try {
                 const res = await (await fetch(API_URL, { method: "POST", body: JSON.stringify(body) })).json();
