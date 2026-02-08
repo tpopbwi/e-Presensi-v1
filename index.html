@@ -252,9 +252,7 @@
                     <input id="reg-nama" type="text" placeholder="Nama Lengkap" class="input-glass">
                     <select id="reg-di" class="input-glass" onchange="window.toggleManual(this, 'manual-di')">
                         <option value="" disabled selected>Pilih Daerah Irigasi (DI)</option>
-                        <option value="DI BARU">DI BARU</option>
-                        <option value="DI POROLINGGO">DI POROLINGGO</option>
-                        <option value="manual">Isi manual...</option>
+                        <option value="DI BARU">DI BARU</option><option value="DI POROLINGGO">DI POROLINGGO</option><option value="manual">Lainnya...</option>
                     </select>
                     <input id="manual-di" type="text" placeholder="Ketik Nama DI" class="input-glass hidden border-emerald-400">
                     <select id="reg-jabatan" class="input-glass" onchange="window.toggleManual(this, 'manual-jabatan')">
@@ -262,9 +260,9 @@
                         <option value="PPA">PPA</option><option value="Pekarya">Pekarya</option><option value="Staf Pengamat">Staf Pengamat</option><option value="manual">Lainnya...</option>
                     </select>
                     <input id="manual-jabatan" type="text" placeholder="Ketik Jabatan" class="input-glass hidden border-emerald-400">
-                    <select id="reg-wilayah" class="input-glass">
+                    <select id="reg-wilayah" class="input-glass" onchange="window.toggleManual(this, 'manual-wilayah')">
                         <option value="" disabled selected>Pilih Wilayah</option>
-                        <option value="Bangorejo">Bangorejo</option><option value="Cluring">Cluring</option><option value="Pesanggaran">Pesanggaran</option><option value="Porolinggo">Porolinggo</option>
+                        <option value="Bangorejo">Bangorejo</option><option value="Cluring">Cluring</option><option value="Pesanggaran">Pesanggaran</option><option value="Porolinggo">Porolinggo</option><option value="manual">Lainnya...</option>
                     </select>
                     <input id="reg-email" type="email" placeholder="Email Aktif" class="input-glass">
                     <input id="reg-hp" type="tel" placeholder="Nomor HP Aktif" class="input-glass">
@@ -724,3 +722,4 @@
     </script>
 </body>
 </html>
+
